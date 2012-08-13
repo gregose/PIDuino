@@ -1,0 +1,15 @@
+path {
+    stroke: red;
+    stroke-width: 4;
+    fill: none;
+}
+
+line {
+    stroke: black;
+    stroke-width: 2;
+}
+
+text {
+    font-size: 10pt;
+    padding: 20px;
+}

@@ -1,0 +1,49 @@
+body {
+  margin-top: 0px;
+  font: 20px "RobotoBlack";
+}
+
+a {
+  color: #00B7FF;
+}
+
+#temp-graph {
+  height: 440px;
+}
+
+.label {
+  margin-bottom: -20px;
+  color: #ccc;
+  font-size: 16px;
+  text-transform: uppercase;
+}
+
+.temp, .time {
+  margin: 0px;
+  font-size: 100px;
+}
+
+span.flare {
+  font-size: 32px;
+  color: #000;
+}
+
+.status {
+  margin: 0px;
+  position: absolute;
+  margin-top: -10px;
+}
+
+ul.status {
+  font-size: 24px;
+  list-style: none;
+  text-transform: uppercase;
+}
+
+ul.status > li.on {
+  color: #000;
+}
+
+ul.status > li.off {
+  color: #ccc;
+}

@@ -1,0 +1,29 @@
+extends layout
+
+block content
+  div.container_12
+    div#temp-graph.grid_12
+    div.clear
+    div.label.grid_3
+      p Boiler 
+    div.label.grid_3
+      p Brew
+    div.label.grid_3
+      p Shot
+    div.clear
+    div.widget.grid_3
+      p#boiler.temp 200
+        span.flare &deg;F
+    div.widget.grid_3
+      p#brew.temp 205
+        span.flare &deg;F
+    div.widget.grid_3
+      p.time 00.0
+        span.flare S
+    div.widget.grid_3
+      ul.status
+        li.on Power
+        li.off Brew
+        li.off Hot Water
+        li.on Steam
+    div.clear
