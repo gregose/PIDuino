@@ -1,0 +1,1 @@
+arduino-mk\winbin\avrdude.exe -c arduino -b 115200 -p atmega328p -P COM4 -U flash:w:build-cli\arduino.hex:i -C arduino-mk\winbin\avrdude.conf

@@ -46,11 +46,16 @@ var sp = new SerialPort("COM4", {
 sp.on("data", function(data) {
   var parts = data.split(",");
   io.sockets.emit('serial', {
-    time: parts[0],
-    amb_temp: parts[1],
-    t1_temp: parts[2],
-    t1_ror: parts[3],
-    t2_temp: parts[4],
-    t2_ror: parts[5]
+    duty: parts[0],
+    time: parts[1],
+    amb_temp: parts[2],
+    t1_temp: parts[3],
+    t1_ror: parts[4],
+    t2_temp: parts[5],
+    t2_ror: parts[6],
+    sw_power: parseInt(parts[7]) == 0,
+    sw_brew: parseInt(parts[8]) == 0,
+    sw_hotwater: parseInt(parts[9]) == 0,
+    sw_steam: parseInt(parts[10]) == 0
   });
 });

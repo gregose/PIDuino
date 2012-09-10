@@ -1,9 +1,11 @@
 var n = 243,
     duration = 750,
     now = new Date(Date.now() - duration),
-    random = d3.random.normal(0, 20)
-    data = d3.range(n).map(function() { return 0; });
-
+    random = d3.random.normal(0, 20),
+    gdata = d3.range(n).map(function() { return 0; }),
+    bdata = d3.range(n).map(function() { return 0; }),
+    t1data = [],
+    t2data = []
 var margin = {top: 6, right: 0, bottom: 20, left: 40},
     width = 940 - margin.right,
     height = 400 - margin.top - margin.bottom;
@@ -34,47 +36,87 @@ svg.append("defs").append("clipPath")
     .attr("height", height);
 
 var axis = svg.append("g")
-    .attr("class", "x axis")
+    .attr("class", "xaxis")
     .attr("transform", "translate(0," + height + ")")
     .call(x.axis = d3.svg.axis().scale(x).orient("bottom"));
 
-var path = svg.append("g")
+//var gpath = svg.append("g")
+//    .attr("clip-path", "url(#clip)")
+//  .append("path")
+//    .data([gdata])
+//    .attr("class", "line")
+
+var bpath = svg.append("g")
     .attr("clip-path", "url(#clip)")
   .append("path")
-    .data([data])
-    .attr("class", "line");
+    .data([bdata])
+    .attr("class", "line")
+
+var gpath = svg.append("g")
+    .attr("clip-path", "url(#clip)")
+  .append("path")
+    .data([gdata])
+    .attr("class", "line")
+
 
 tick();
 
 function tick() {
-
   // update the domains
   now = new Date();
   x.domain([now - (n - 2) * duration, now - duration]);
-  y.domain([0, d3.max(data)]);
+  //y.domain([0, d3.max(gdata)]);
+  y.domain([60, 250]);
 
   // push the accumulated count onto the back, and reset the count
-  data.push(random());
+
+  // Get average temp during tick duration
+  var sum = 0, avg = 0, tcopy;
+
+  tcopy = t1data;
+  t1data = [];
+  tcopy.forEach(function(n){
+    sum += parseFloat(n); 
+    avg = sum / tcopy.length;
+  });
+  console.log(avg);
+  bdata.push(avg);
+
+  sum = 0;
+  tcopy = t2data;
+  t2data = [];
+  tcopy.forEach(function(n){
+    sum += parseFloat(n); 
+    avg = sum / tcopy.length;
+  });
+  console.log(avg);
+  gdata.push(avg);
+
 
   // redraw the line
-  svg.select(".line")
+  svg.selectAll(".line")
       .attr("d", line)
       .attr("transform", null);
+
+  // slide the line left
+  bpath.transition()
+      .duration(duration)
+      .ease("linear")
+      .attr("transform", "translate(" + x(now - (n - 1) * duration) + ")")
+  // slide the line left
+  gpath.transition()
+      .duration(duration)
+      .ease("linear")
+      .attr("transform", "translate(" + x(now - (n - 1) * duration) + ")")
 
   // slide the x-axis left
   axis.transition()
       .duration(duration)
       .ease("linear")
-      .call(x.axis);
-
-  // slide the line left
-  path.transition()
-      .duration(duration)
-      .ease("linear")
-      .attr("transform", "translate(" + x(now - (n - 1) * duration) + ")")
+      .call(x.axis)
       .each("end", tick);
 
   // pop the old data point off the front
-  data.shift();
-
+  gdata.shift();
+  bdata.shift();
 }
