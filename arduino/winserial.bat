@@ -1,0 +1,1 @@
+arduino-mk\winbin\putty.exe -serial COM4 -sercfg 57600
