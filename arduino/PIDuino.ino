@@ -8,31 +8,38 @@
 
 // Third-party libraries
 #include <Scheduler.h>
-#include <OptoIn.h>
 #include <PIDuinoTasks.h>
+#include <TempMonitor.h>
 
 #include "PIDuino.h"
 
-Scheduler __scheduler;
+Scheduler scheduler;
 
-Blinker _blinker13(13, 500);
-OptoStatusUpdater _opto_status_updater(50);
+Blinker blink_13(13, 500);
+OptoStatusUpdater opto_status_updater(50);
+TempUpdater temp_updater(2000);
+
 
 void setup()
 {
+  delay(500);
 
+  Wire.begin();
   Serial.begin(BAUD);
 
-  _blinker13.setup();
-  _opto_status_updater.setup();
 
-  __scheduler.setup();
+  blink_13.setup();
+  opto_status_updater.setup();
+  temp_updater.setup();
 
-  __scheduler.queue(&_blinker13);
-  __scheduler.queue(&_opto_status_updater);
+  scheduler.setup();
+
+  scheduler.queue(&blink_13);
+  scheduler.queue(&opto_status_updater);
+  scheduler.queue(&temp_updater);
 }
 
 void loop()
 {
-  __scheduler.processMessages();
+  scheduler.processMessages();
 }

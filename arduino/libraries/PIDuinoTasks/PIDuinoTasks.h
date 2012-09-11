@@ -8,6 +8,7 @@
 #endif
 
 #include "OptoStatusUpdater.h"
+#include "TempUpdater.h"
 #include "Blinker.h"
 
 #endif

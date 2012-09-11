@@ -1,6 +1,3 @@
-#include <OptoIn.h>
-#include <Scheduler.h>
-
 #include "OptoStatusUpdater.h"
 
 OptoStatusUpdater::OptoStatusUpdater(int period)
