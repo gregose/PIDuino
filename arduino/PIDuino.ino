@@ -8,25 +8,29 @@
 
 // Third-party libraries
 #include <Scheduler.h>
+#include <PWM16.h>
 #include <PIDuinoTasks.h>
 #include <TempMonitor.h>
 
 #include "PIDuino.h"
 
+
+PWM16 ssr;
+
 Scheduler scheduler;
 
 Blinker blink_13(13, 500);
-OptoStatusUpdater opto_status_updater(50);
+OptoStatusUpdater opto_status_updater(50, &ssr);
 TempUpdater temp_updater(2000);
-
 
 void setup()
 {
-  delay(500);
-
   Wire.begin();
   Serial.begin(BAUD);
 
+  // SSR, uses timer1 to schedule duty cycle
+  ssr.Setup(SSR_FREQ);
+  ssr.Out(0, 0); // init to 0% duty, OT2 always 0% for now
 
   blink_13.setup();
   opto_status_updater.setup();
