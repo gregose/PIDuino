@@ -11,7 +11,11 @@
   #include "WProgram.h"
 #endif
 
-#include <PID_v1.h>
+#include <PID.h>
+
+PID::PID() {
+
+}
 
 /*Constructor (...)*********************************************************
  *    The parameters specified here are those for for which we can't set up 
@@ -20,23 +24,22 @@
 PID::PID(double* Input, double* Output, double* Setpoint,
         double Kp, double Ki, double Kd, int ControllerDirection)
 {
-	PID::SetOutputLimits(0, 255);				//default output limit corresponds to 
-												//the arduino pwm limits
+    PID::SetOutputLimits(0, 255); //default output limit corresponds to 
+                                  //the arduino pwm limits
 
-    SampleTime = 100;							//default Controller Sample Time is 0.1 seconds
+    SampleTime = 100;             //default Controller Sample Time is 0.1 seconds
 
     PID::SetControllerDirection(ControllerDirection);
     PID::SetTunings(Kp, Ki, Kd);
 
-    lastTime = millis()-SampleTime;				
+    //lastTime = millis()-SampleTime;       
     inAuto = false;
     myOutput = Output;
     myInput = Input;
     mySetpoint = Setpoint;
-		
+    
 }
- 
- 
+
 /* Compute() **********************************************************************
  *     This, as they say, is where the magic happens.  this function should be called
  *   every time "void loop()" executes.  the function will decide for itself whether a new
@@ -44,30 +47,30 @@ PID::PID(double* Input, double* Output, double* Setpoint,
  **********************************************************************************/ 
 void PID::Compute()
 {
-   if(!inAuto) return;
-   unsigned long now = millis();
-   unsigned long timeChange = (now - lastTime);
-   if(timeChange>=SampleTime)
-   {
+    if(!inAuto) return;
+   //unsigned long now = millis();
+   //unsigned long timeChange = (now - lastTime);
+   //if(timeChange>=SampleTime)
+   //{
       /*Compute all the working error variables*/
-	  double input = *myInput;
-      double error = *mySetpoint - input;
-      ITerm+= (ki * error);
-      if(ITerm > outMax) ITerm= outMax;
-      else if(ITerm < outMin) ITerm= outMin;
-      double dInput = (input - lastInput);
- 
-      /*Compute PID Output*/
-      double output = kp * error + ITerm- kd * dInput;
-      
-	  if(output > outMax) output = outMax;
-      else if(output < outMin) output = outMin;
-	  *myOutput = output;
+    double input = *myInput;
+    double error = *mySetpoint - input;
+    ITerm+= (ki * error);
+    if(ITerm > outMax) ITerm= outMax;
+    else if(ITerm < outMin) ITerm= outMin;
+    double dInput = (input - lastInput);
+
+    /*Compute PID Output*/
+    double output = kp * error + ITerm- kd * dInput;
+
+    if(output > outMax) output = outMax;
+    else if(output < outMin) output = outMin;
+    *myOutput = output;
 	  
       /*Remember some variables for next time*/
-      lastInput = input;
-      lastTime = now;
-   }
+   //   lastInput = input;
+   //   lastTime = now;
+   //}
 }
 
 
@@ -88,11 +91,11 @@ void PID::SetTunings(double Kp, double Ki, double Kd)
    kd = Kd / SampleTimeInSec;
  
   if(controllerDirection ==REVERSE)
-   {
-      kp = (0 - kp);
-      ki = (0 - ki);
-      kd = (0 - kd);
-   }
+  {
+    kp = (0 - kp);
+    ki = (0 - ki);
+    kd = (0 - kd);
+  }
 }
   
 /* SetSampleTime(...) *********************************************************
@@ -100,14 +103,14 @@ void PID::SetTunings(double Kp, double Ki, double Kd)
  ******************************************************************************/
 void PID::SetSampleTime(int NewSampleTime)
 {
-   if (NewSampleTime > 0)
-   {
-      double ratio  = (double)NewSampleTime
-                      / (double)SampleTime;
-      ki *= ratio;
-      kd /= ratio;
-      SampleTime = (unsigned long)NewSampleTime;
-   }
+  if (NewSampleTime > 0)
+  {
+    double ratio  = (double)NewSampleTime
+                    / (double)SampleTime;
+    ki *= ratio;
+    kd /= ratio;
+    SampleTime = (unsigned long)NewSampleTime;
+  }
 }
  
 /* SetOutputLimits(...)****************************************************
@@ -120,18 +123,18 @@ void PID::SetSampleTime(int NewSampleTime)
  **************************************************************************/
 void PID::SetOutputLimits(double Min, double Max)
 {
-   if(Min >= Max) return;
-   outMin = Min;
-   outMax = Max;
+  if(Min >= Max) return;
+  outMin = Min;
+  outMax = Max;
  
-   if(inAuto)
-   {
-	   if(*myOutput > outMax) *myOutput = outMax;
-	   else if(*myOutput < outMin) *myOutput = outMin;
-	 
-	   if(ITerm > outMax) ITerm= outMax;
-	   else if(ITerm < outMin) ITerm= outMin;
-   }
+  if(inAuto)
+  {
+    if(*myOutput > outMax) *myOutput = outMax;
+    else if(*myOutput < outMin) *myOutput = outMin;
+
+    if(ITerm > outMax) ITerm= outMax;
+    else if(ITerm < outMin) ITerm= outMin;
+  }
 }
 
 /* SetMode(...)****************************************************************
@@ -141,12 +144,12 @@ void PID::SetOutputLimits(double Min, double Max)
  ******************************************************************************/ 
 void PID::SetMode(int Mode)
 {
-    bool newAuto = (Mode == AUTOMATIC);
-    if(newAuto == !inAuto)
-    {  /*we just went from manual to auto*/
-        PID::Initialize();
-    }
-    inAuto = newAuto;
+  bool newAuto = (Mode == AUTOMATIC);
+  if(newAuto == !inAuto)
+  {  /*we just went from manual to auto*/
+      PID::Initialize();
+  }
+  inAuto = newAuto;
 }
  
 /* Initialize()****************************************************************
@@ -155,10 +158,10 @@ void PID::SetMode(int Mode)
  ******************************************************************************/ 
 void PID::Initialize()
 {
-   ITerm = *myOutput;
-   lastInput = *myInput;
-   if(ITerm > outMax) ITerm = outMax;
-   else if(ITerm < outMin) ITerm = outMin;
+  ITerm = *myOutput;
+  lastInput = *myInput;
+  if(ITerm > outMax) ITerm = outMax;
+  else if(ITerm < outMin) ITerm = outMin;
 }
 
 /* SetControllerDirection(...)*************************************************
@@ -169,13 +172,13 @@ void PID::Initialize()
  ******************************************************************************/
 void PID::SetControllerDirection(int Direction)
 {
-   if(inAuto && Direction !=controllerDirection)
-   {
-	  kp = (0 - kp);
-      ki = (0 - ki);
-      kd = (0 - kd);
-   }   
-   controllerDirection = Direction;
+  if(inAuto && Direction !=controllerDirection)
+  {
+    kp = (0 - kp);
+    ki = (0 - ki);
+    kd = (0 - kd);
+  }   
+  controllerDirection = Direction;
 }
 
 /* Status Funcions*************************************************************

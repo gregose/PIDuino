@@ -1,10 +1,10 @@
 #include "OptoStatusUpdater.h"
 
-OptoStatusUpdater::OptoStatusUpdater(int period_in, PWM16* ssr_in = NULL)
+OptoStatusUpdater::OptoStatusUpdater(int period_in, PIDUpdater* pid_in = NULL)
 {
   period = period_in;
-  ssr = ssr_in;
   opto_in = OptoIn();
+  pid = pid_in;
 }
 
 void OptoStatusUpdater::setup(){
@@ -19,12 +19,21 @@ void OptoStatusUpdater::run(Scheduler* scheduler)
     OptoStatus * opto_status = opto_in.Status();
 
     // Set appropiate SSR state
-    if(ssr && opto_status->ch0)
-      ssr->Out(100,0);
-    if(ssr && !(opto_status->ch0))
-      ssr->Out(0,0);
+    if(opto_status->ch0)
+      pid->enable();
+    else
+      pid->disable();
+
+    // Set correct temp based on steam switch or not
+    if(opto_status->ch3)
+      pid->steamSetPoint();
+    else
+      pid->brewSetPoint();
+
+
 
     // Output status
+    Serial.print("S|");
     Serial.print(opto_status->ch0);
     Serial.print("|");
     Serial.print(opto_status->ch1);

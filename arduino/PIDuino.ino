@@ -20,8 +20,9 @@ PWM16 ssr;
 Scheduler scheduler;
 
 Blinker blink_13(13, 500);
-OptoStatusUpdater opto_status_updater(50, &ssr);
-TempUpdater temp_updater(2000);
+TempUpdater temp_updater(1000);
+PIDUpdater pid_updater(2000, &ssr, &temp_updater);
+OptoStatusUpdater opto_status_updater(50, &pid_updater);
 
 void setup()
 {
@@ -33,14 +34,16 @@ void setup()
   ssr.Out(0, 0); // init to 0% duty, OT2 always 0% for now
 
   blink_13.setup();
-  opto_status_updater.setup();
   temp_updater.setup();
+  pid_updater.setup();
+  opto_status_updater.setup();
 
   scheduler.setup();
 
   scheduler.queue(&blink_13);
   scheduler.queue(&opto_status_updater);
   scheduler.queue(&temp_updater);
+  scheduler.queue(&pid_updater);
 }
 
 void loop()

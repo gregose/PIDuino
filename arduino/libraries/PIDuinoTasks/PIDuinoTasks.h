@@ -7,8 +7,9 @@
 #include <WProgram.h>
 #endif
 
-#include "OptoStatusUpdater.h"
 #include "TempUpdater.h"
+#include "PIDUpdater.h"
+#include "OptoStatusUpdater.h"
 #include "Blinker.h"
 
 #endif

@@ -1,7 +1,7 @@
 #ifndef PIDuinoTasks_OptoStatusUpdater_h
 #define PIDuinoTasks_OptoStatusUpdater_h
 
-#include <PWM16.h>
+#include "PIDUpdater.h"
 #include <OptoIn.h>
 #include <Scheduler.h>
 
@@ -10,12 +10,12 @@ class OptoStatusUpdater : public ITask
   public:
     void setup();
     void run(Scheduler*);
-    OptoStatusUpdater(int, PWM16*);
+    OptoStatusUpdater(int, PIDUpdater*);
     
   private:
     int period;
     OptoIn opto_in;
-    PWM16* ssr;
+    PIDUpdater* pid;
 };
 
 #endif

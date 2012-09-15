@@ -1,9 +1,10 @@
 #include "TempUpdater.h"
 
-TempUpdater::TempUpdater(int period_in) {
+TempUpdater::TempUpdater(int idle_time_in) {
   temp_monitor = TempMonitor();
+  last_temp_status = TempStatus();
   run_state = RUN_STATE_IDLE;
-  period = period_in; // time in between temp reads
+  idle_time = idle_time_in; // time in between temp reads
 }
 
 void TempUpdater::setup() {
@@ -17,6 +18,10 @@ void TempUpdater::next() {
     run_state = RUN_STATE_IDLE;
 }
 
+TempStatus* TempUpdater::lastTemp() {
+  return &last_temp_status;
+}
+
 void TempUpdater::run(Scheduler* scheduler) {
   int n_period = 0;
 
@@ -25,7 +30,7 @@ void TempUpdater::run(Scheduler* scheduler) {
 
   switch (run_state) {
     case RUN_STATE_IDLE:
-      n_period = period;
+      n_period = idle_time;
       break;
     case RUN_STATE_CONVERT_BOILER:
       n_period = temp_monitor.convert(BOILER);
@@ -41,12 +46,20 @@ void TempUpdater::run(Scheduler* scheduler) {
       break;
     case RUN_STATE_READ:
       TempStatus * temp_status = temp_monitor.status();
+
+      Serial.print("T|");
       Serial.print(temp_status->ambient);
       Serial.print("|");
       Serial.print(temp_status->boiler);
       Serial.print("|");
       Serial.print(temp_status->brewgroup);
       Serial.println();
+
+      // For PID updates
+      last_temp_status.ambient = temp_status->ambient;
+      last_temp_status.boiler = temp_status->boiler;
+      last_temp_status.brewgroup = temp_status->brewgroup;
+
       break;
   }
 
