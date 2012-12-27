@@ -31,7 +31,7 @@ uint32_t TempMonitor::convert(int channel){
 
 void TempMonitor::sample(int channel) {
   int32_t v;
-  float tempC;
+  float temp;
 
   //Serial.print("Sampling - ");
   //Serial.println(channel);
@@ -47,21 +47,31 @@ void TempMonitor::sample(int channel) {
 
 
   // Convert with ambient temp and to F
-  tempC = tc.Temp_C( 0.001 * v, amb.getAmbC() ); // convert to Celsius
+
+#ifdef TEMP_UNIT_F
+  temp = tc.Temp_F( 0.001 * v, amb.getAmbF() ); 
+#else
+  temp = tc.Temp_C( 0.001 * v, amb.getAmbC() );
+#endif
 
   //Serial.println(C_TO_F(tempC));
   //v = round( C_TO_F( tempC ) / D_MULT ); // store results as integers
   
   // Increase sample count
   temp_samples.samples++;
+
+#ifdef TEMP_UNIT_F
   temp_samples.ambient += amb.getAmbF();
+#else
+  temp_samples.ambient += amb.getAmbC();
+#endif
 
   switch (channel) {
     case BOILER: 
-      temp_samples.boiler += C_TO_F(tempC);
+      temp_samples.boiler += temp;
       break;
     case BREWGROUP:
-      temp_samples.brewgroup += C_TO_F(tempC);
+      temp_samples.brewgroup += temp;
       break;
   }
 }

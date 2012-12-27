@@ -156,7 +156,7 @@ int32_t cADC::readuV() {
   v >>= ( nLSB + gn ); // v = raw reading, uV
   // calculate effect of external calibration gain; minimize loss of significance
   int32_t deltaV = round( (float)v * cal_gain );
-  return v + deltaV;  // returns corrected, unfiltered value of uV
+  return v + deltaV + cal_offset;  // returns corrected, unfiltered value of uV
 };
 
 // -------------------------------------

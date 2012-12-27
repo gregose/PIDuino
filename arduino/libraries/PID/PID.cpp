@@ -55,21 +55,36 @@ void PID::Compute()
       /*Compute all the working error variables*/
     double input = *myInput;
     double error = *mySetpoint - input;
-    ITerm+= (ki * error);
+    ITerm+= (error);
+    
     if(ITerm > outMax) ITerm= outMax;
     else if(ITerm < outMin) ITerm= outMin;
     double dInput = (input - lastInput);
 
     /*Compute PID Output*/
-    double output = kp * error + ITerm- kd * dInput;
+    double output = (kp * error) + (ITerm/ki) - (kd * dInput);
+    //double output = kp * error; // pid tuning mode, K only
+
 
     if(output > outMax) output = outMax;
     else if(output < outMin) output = outMin;
+
+    /*
+    if (error < 5 && output > 50)
+      output = 50;
+
+    if (error > 0 && error < 1 && output > 15)
+      output = 15;
+
+    if (error > 0 && error < 0.5)
+      output = 0;
+    */
+
     *myOutput = output;
 	  
-      /*Remember some variables for next time*/
-   //   lastInput = input;
-   //   lastTime = now;
+    /*Remember some variables for next time*/
+    lastInput = input;
+   // lastTime = now;
    //}
 }
 

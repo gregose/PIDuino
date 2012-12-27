@@ -11,5 +11,6 @@
 #include "PIDUpdater.h"
 #include "OptoStatusUpdater.h"
 #include "Blinker.h"
+#include "PIDPot.h"
 
 #endif

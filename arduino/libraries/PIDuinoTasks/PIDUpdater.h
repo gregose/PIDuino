@@ -4,6 +4,7 @@
 #include "TempUpdater.h"
 #include <PWM16.h>
 #include <PID.h>
+#include <PIDPot.h>
 #include <Scheduler.h>
 
 // #define BREW_TEMP 195.00
@@ -18,7 +19,7 @@ class PIDUpdater : public ITask
   public:
     void setup();
     void run(Scheduler*);
-    PIDUpdater(int, PWM16*, TempUpdater*);
+    PIDUpdater(int, PWM16*, TempUpdater*, PIDPot*);
     void enable();
     void disable();
     void brewSetPoint();
@@ -28,11 +29,18 @@ class PIDUpdater : public ITask
     int period;
     TempUpdater* temp;
     PWM16* ssr;
-    PID pid;
-    double input;
-    double output;
-    double setpoint;
+    PIDPot* pidpot;
+
+    float setpoint;
     bool enabled;
+
+    float previous_error;
+    float previous_time;
+    float integral;
+
+    float Kp;
+    float Ki;
+    float Kd;
 };
 
 #endif
