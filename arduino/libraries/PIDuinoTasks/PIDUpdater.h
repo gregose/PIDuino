@@ -3,7 +3,6 @@
 
 #include "TempUpdater.h"
 #include <PWM16.h>
-#include <PID.h>
 #include <PIDPot.h>
 #include <Scheduler.h>
 
@@ -21,7 +20,7 @@ class PIDUpdater : public ITask
     void run(Scheduler*);
     PIDUpdater(int, PWM16*, TempUpdater*, PIDPot*);
     void enable();
-    void disable();
+    void disable(int);
     void brewSetPoint();
     void steamSetPoint();
     
@@ -37,10 +36,14 @@ class PIDUpdater : public ITask
     float previous_error;
     float previous_time;
     float integral;
+    float output;
+    float integral_max;
+    float integral_cutoff_error;
 
     float Kp;
     float Ki;
     float Kd;
+
 };
 
 #endif

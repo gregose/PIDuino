@@ -19,18 +19,20 @@ void OptoStatusUpdater::run(Scheduler* scheduler)
     OptoStatus * opto_status = opto_in.Status();
 
     // Set appropiate SSR state
-    if(opto_status->ch0)
-      pid->enable();
-    else
-      pid->disable();
+    if(opto_status->ch0) {
+      if(opto_status->ch1 || opto_status->ch2) // we are either brewing or steaming
+        pid->disable(100); // disable PID, max duty for pump
+      else
+        pid->enable();
+    } else {
+      pid->disable(0); // set output off
+    }
 
     // Set correct temp based on steam switch or not
     if(opto_status->ch3)
       pid->steamSetPoint();
     else
       pid->brewSetPoint();
-
-
 
     // Output status
     Serial.print("S|");

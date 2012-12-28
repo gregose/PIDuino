@@ -19,15 +19,23 @@ PIDUpdater::PIDUpdater(int period_in, PWM16* ssr_in, TempUpdater* temp_in, PIDPo
   //Kp = 0.20 * Ku;
   //Ki = (2.0 * Kp) / Tu;
   //Kd = (Kp * Tu) / 3;
+  
+  // Prevent integral windup from intial machine warmup
+  // From http://playground.arduino.cc/Main/BarebonesPIDForEspresso#pid
+  // http://en.wikipedia.org/wiki/Integral_windup
 
-  temp = temp_in;
-  ssr = ssr_in;
-  period = period_in;
-  pidpot = pidpot_in;
+  // Conditional integration http://protuner.com/app6.pdf, https://controls.engin.umich.edu/wiki/index.php/PIDDownsides#Windup
+  integral_cutoff_error = 10;
+  integral_max = 200;
+
+  temp = temp_in; // Temp status
+  ssr = ssr_in; // SSR, OT1 - boiler
+  period = period_in; // Update period
+  pidpot = pidpot_in; // Manual control if needed
 
   setpoint = BREW_TEMP;
 
-  disable();
+  disable(0);
                                         //k: P  I  D
   //pid = PID(&input, &output, &setpoint, 2, 5, 1, DIRECT);
 
@@ -49,27 +57,25 @@ PIDUpdater::PIDUpdater(int period_in, PWM16* ssr_in, TempUpdater* temp_in, PIDPo
       It should yield a system that is slightly underdamped; if a less "aggressive" response is 
       desired try reducing P to half the values listed.
   */
-
-  //pid = PID(&input, &output, &setpoint, 6, 2, 1, DIRECT);
-
-  //pid.SetSampleTime(period);
-  //pid.SetOutputLimits(0,100);
-  //pid.SetMode(MANUAL);
 }
 
 void PIDUpdater::enable() {
   enabled = true;
-  //pid.SetMode(AUTOMATIC);
 }
 
-void PIDUpdater::disable() {
+void PIDUpdater::disable(int duty) {
   enabled = false;
 
   // Reset PID calculations
   previous_time = 0;
   previous_error = 0;
   integral = 0;
-  //pid.SetMode(MANUAL);
+
+  // Set SSR duty
+  if(duty == -1) // maintain
+    ssr->Out(output, 0);
+  else // set to passed value
+    ssr->Out(duty, 0); // Set OT1 to output
 }
 
 void PIDUpdater::brewSetPoint() {
@@ -80,7 +86,6 @@ void PIDUpdater::steamSetPoint() {
   setpoint = STEAM_TEMP;
 }
 
-
 void PIDUpdater::setup() {
 }
 
@@ -88,11 +93,12 @@ void PIDUpdater::run(Scheduler* scheduler) {
   
   float error;
   float derivative;
-  float output;
   float dt;
   float measured_value;
+  float iterm;
 
   if(enabled) {
+
     if(previous_time == 0) {
       previous_time = millis(); // use exact time in case scheduler slows down
       scheduler->schedule(this, period);
@@ -104,9 +110,22 @@ void PIDUpdater::run(Scheduler* scheduler) {
     measured_value = temp->lastTemp()->boiler;
 
     error = setpoint - measured_value;
-    integral += error * dt;
+
+    
     derivative = (error - previous_error) / dt;
-    output = (Kp * error) + (Ki * integral) + (Kd * derivative);
+
+    if(error > integral_cutoff_error) { // disable integration if large error
+      output = (Kp * error) + (Kd * derivative);
+    } else {
+      integral += error * dt;
+      // windup protection
+      if(integral > integral_max)
+        integral = integral_max;
+      else if(integral < -integral_max)
+        integral = -integral_max;
+
+      output = (Kp * error) + (Ki * integral) + (Kd * derivative);
+    }
     previous_error = error;
 
     // set output limits
