@@ -9,8 +9,8 @@
 // #define BREW_TEMP 195.00
 // #define STEAM_TEMP 290.00
 
-#define BREW_TEMP 150.00
-#define STEAM_TEMP 190.00
+#define BREW_TEMP 209.00
+#define STEAM_TEMP 275.00
 
 
 class PIDUpdater : public ITask
