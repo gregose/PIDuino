@@ -1,25 +1,28 @@
-var n = 243,
-    duration = 750,
+var nmax = 280,
+    nmin = 60,
+    duration = 2000,
     now = new Date(Date.now() - duration),
     random = d3.random.normal(0, 20),
-    gdata = d3.range(n).map(function() { return 0; }),
-    bdata = d3.range(n).map(function() { return 0; }),
+    gdata = d3.range(nmax).map(function() { return 0; }),
+    bdata = d3.range(nmax).map(function() { return 0; }),
     t1data = [],
     t2data = []
-var margin = {top: 6, right: 0, bottom: 20, left: 40},
+
+var margin = {top: 10, right: 50, bottom: 40, left: 40},
     width = 940 - margin.right,
-    height = 400 - margin.top - margin.bottom;
+    height = 360 - margin.top - margin.bottom;
 
 var x = d3.time.scale()
-    .domain([now - (n - 2) * duration, now - duration])
+    .domain([now - (nmax - 2) * duration, now - duration])
     .range([0, width]);
 
 var y = d3.scale.linear()
+    .domain([nmin, nmax])
     .range([height, 0]);
 
 var line = d3.svg.line()
     .interpolate("basis")
-    .x(function(d, i) { return x(now - (n - 1 - i) * duration); })
+    .x(function(d, i) { return x(now - (nmax - 1 - i) * duration); })
     .y(function(d, i) { return y(d); });
 
 var svg = d3.select("#temp-graph").append("p").append("svg")
@@ -40,6 +43,11 @@ var axis = svg.append("g")
     .attr("transform", "translate(0," + height + ")")
     .call(x.axis = d3.svg.axis().scale(x).orient("bottom"));
 
+var yaxis = svg.append("g")
+    .attr("class", "yaxis")
+    .attr("transform", "translate(" + width + ",0)")
+    .call(y.axis = d3.svg.axis().scale(y).orient("right"));
+
 //var gpath = svg.append("g")
 //    .attr("clip-path", "url(#clip)")
 //  .append("path")
@@ -50,23 +58,23 @@ var bpath = svg.append("g")
     .attr("clip-path", "url(#clip)")
   .append("path")
     .data([bdata])
-    .attr("class", "line")
+    .attr("class", "line boiler")
 
 var gpath = svg.append("g")
     .attr("clip-path", "url(#clip)")
   .append("path")
     .data([gdata])
-    .attr("class", "line")
-
+    .attr("class", "line grouphead")
 
 tick();
 
 function tick() {
   // update the domains
   now = new Date();
-  x.domain([now - (n - 2) * duration, now - duration]);
+
+  x.domain([now - (nmax - 2) * duration, now - duration]);
   //y.domain([0, d3.max(gdata)]);
-  y.domain([60, 250]);
+  y.domain([nmin, nmax]);
 
   // push the accumulated count onto the back, and reset the count
 
@@ -79,7 +87,7 @@ function tick() {
     sum += parseFloat(n); 
     avg = sum / tcopy.length;
   });
-  console.log(avg);
+  //console.log(avg);
   bdata.push(avg);
 
   sum = 0;
@@ -89,7 +97,7 @@ function tick() {
     sum += parseFloat(n); 
     avg = sum / tcopy.length;
   });
-  console.log(avg);
+  //console.log(avg);
   gdata.push(avg);
 
 
@@ -102,12 +110,12 @@ function tick() {
   bpath.transition()
       .duration(duration)
       .ease("linear")
-      .attr("transform", "translate(" + x(now - (n - 1) * duration) + ")")
+      .attr("transform", "translate(" + x(now - (nmax - 1) * duration) + ")")
   // slide the line left
   gpath.transition()
       .duration(duration)
       .ease("linear")
-      .attr("transform", "translate(" + x(now - (n - 1) * duration) + ")")
+      .attr("transform", "translate(" + x(now - (nmax - 1) * duration) + ")")
 
   // slide the x-axis left
   axis.transition()
