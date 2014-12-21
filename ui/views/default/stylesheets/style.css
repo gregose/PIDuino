@@ -1,0 +1,71 @@
+body {
+  margin-top: 15px;
+  font: 20px "RobotoLight";
+  background-color: black;
+  color: #fefefe;
+}
+
+a {
+  color: #00B7FF;
+}
+
+#temp-graph {
+  height: 360px;
+}
+
+.label {
+  margin-bottom: 0px;
+  font-size: 24px;
+  color: #99cc00;
+}
+
+.temp, .time {
+  margin: 0px;
+  text-align: left;
+  font: 80px "RobotoBold";
+}
+
+#brew_detail {
+  text-align: left;
+  margin-top: -30px;
+}
+
+#boiler {
+  text-align: left;
+  font: 180px "RobotoBold";
+  margin-top: -0px;
+}
+
+span.reset {
+  float: right;
+  font-size: 18px;
+  color: #00B7FF;
+}
+
+span.flare {
+  position: relative;
+  font-size: 32px;
+  display: none;
+}
+
+.status {
+}
+
+ul.status {
+  list-style: none;
+  margin-left: 0px;
+  padding-left: 0px;
+  font: 26px "RobotoBold";
+}
+
+li.status {
+  margin-left: 0px;
+}
+
+ul.status > li.on {
+  color: #000;
+}
+
+ul.status > li.off {
+  color: #ccc;
+}

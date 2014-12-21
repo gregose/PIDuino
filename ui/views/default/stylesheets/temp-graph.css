@@ -1,0 +1,28 @@
+path {
+    stroke: white;
+    stroke-width: 4;
+    fill: none;
+}
+
+line {
+    stroke: white;
+    stroke-width: 4;
+}
+
+.boiler {
+    stroke: #ff4444;
+    stroke-width: 4;
+    color: #ff4444;
+}
+
+.grouphead {
+    stroke: #aa66cc;
+    stroke-width: 4;
+    color: #aa66cc;
+}
+
+text {
+    font-size: 18pt;
+    padding: 20px;
+    fill: white;
+}
