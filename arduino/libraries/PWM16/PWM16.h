@@ -149,6 +149,8 @@ class PWM16 {
 
 };
 
+// Timer3 not on atmega32u4
+#if defined(__AVR_ATmega328P__)
 // definitions for PWM frequency selection on IO3
 
 #define IO3_PIN 3 // pin DIO3 for IO3
@@ -179,6 +181,7 @@ class PWM_IO3 {
 
 // void setupIO3( uint8_t pwm = IO3_FASTPWM, uint8_t prescale = IO3_PRESCALE_1024 );
 
+#endif
 /*
 PWM Frequencies
 

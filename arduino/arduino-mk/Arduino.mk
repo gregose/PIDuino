@@ -293,9 +293,9 @@ ifndef AVR_TOOLS_PATH
 AVR_TOOLS_PATH    = $(AVR_TOOLS_DIR)/bin
 endif
 
-ARDUINO_LIB_PATH  = $(ARDUINO_DIR)/libraries
-ARDUINO_CORE_PATH = $(ARDUINO_DIR)/hardware/arduino/cores/arduino
-ARDUINO_VAR_PATH  = $(ARDUINO_DIR)/hardware/arduino/variants
+ARDUINO_LIB_PATH  = $(ARDUINO_DIR)/hardware/arduino/avr/libraries
+ARDUINO_CORE_PATH = $(ARDUINO_DIR)/hardware/arduino/avr/cores/arduino
+ARDUINO_VAR_PATH  = $(ARDUINO_DIR)/hardware/arduino/avr/variants
 
 else
 
@@ -358,7 +358,7 @@ BOARD_TAG   = uno
 endif
 
 ifndef BOARDS_TXT
-BOARDS_TXT  = $(ARDUINO_DIR)/hardware/arduino/boards.txt
+BOARDS_TXT  = $(ARDUINO_DIR)/hardware/arduino/avr/boards.txt
 endif
 
 ifndef PARSE_BOARD
@@ -382,6 +382,16 @@ endif
 ifndef MCU
 MCU   = $(shell $(PARSE_BOARD_CMD) $(BOARD_TAG) build.mcu)
 endif
+
+# usb stuff
+ifndef USB_VID
+USB_VID   = $(shell $(PARSE_BOARD_CMD) $(BOARD_TAG) build.vid)
+endif
+ifndef USB_PID
+USB_PID   = $(shell $(PARSE_BOARD_CMD) $(BOARD_TAG) build.pid)
+endif
+
+
 
 ifndef F_CPU
 F_CPU = $(shell $(PARSE_BOARD_CMD) $(BOARD_TAG) build.f_cpu)
@@ -494,7 +504,9 @@ LIB_OBJS      = $(patsubst $(ARDUINO_LIB_PATH)/%.c,$(OBJDIR)/libs/%.o,$(LIB_C_SR
 USER_LIB_OBJS = $(patsubst $(USER_LIB_PATH)/%.cpp,$(OBJDIR)/libs/%.o,$(USER_LIB_CPP_SRCS)) \
 		$(patsubst $(USER_LIB_PATH)/%.c,$(OBJDIR)/libs/%.o,$(USER_LIB_C_SRCS))
 
-CPPFLAGS      = -mmcu=$(MCU) -DF_CPU=$(F_CPU) -DARDUINO=$(ARDUINO_VERSION) \
+CPPFLAGS      = -mmcu=$(MCU) \
+			-DF_CPU=$(F_CPU) -DARDUINO=$(ARDUINO_VERSION) \
+			-DUSB_VID=$(USB_VID) -DUSB_PID=$(USB_PID) \
 			-I. -I$(ARDUINO_CORE_PATH) -I$(ARDUINO_VAR_PATH)/$(VARIANT) \
 			$(SYS_INCLUDES) $(USER_INCLUDES) -g -Os -w -Wall \
 			-ffunction-sections -fdata-sections

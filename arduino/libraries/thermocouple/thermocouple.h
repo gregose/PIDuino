@@ -52,7 +52,7 @@
 #define F_TO_C(x) ( ( x - 32.0 ) / 1.8 )
 
 typedef float FLOAT;
-typedef float PFLOAT;
+typedef const float PFLOAT;
 
 // ----------------- base class for thermocouples
 //
@@ -75,7 +75,7 @@ class tcBase { // pure virtual base class
   protected:
     virtual FLOAT absTemp_C( FLOAT mV ) = 0;   // returns temperature (referenced to 0C) for mV
     virtual FLOAT absMV_C( FLOAT tempC ) = 0;  // returns raw mV reading for temp referenced to 0C
-    virtual FLOAT _poly( FLOAT x, FLOAT* coeff, uint8_t nrows, uint8_t ncols );
+    virtual FLOAT _poly( FLOAT x, PFLOAT* coeff, uint8_t nrows, uint8_t ncols );
 };
 
 class tcLinear : public tcBase { // basic linear approximation

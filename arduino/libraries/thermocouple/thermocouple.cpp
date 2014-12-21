@@ -89,7 +89,7 @@ FLOAT tcBase::mV_F( FLOAT tempF ) {
 
 // evaluate polynomial using Horner's rule
 // coeff must point to top of selected column of coefficients in nrows x ncols array
-FLOAT tcBase::_poly( FLOAT x, FLOAT* coeff, uint8_t nrows, uint8_t ncols ) {
+FLOAT tcBase::_poly( FLOAT x, PFLOAT* coeff, uint8_t nrows, uint8_t ncols ) {
   uint8_t idx = ( nrows - 1 ) * ncols; // point to the bottom of the column
   FLOAT fx = 0.0; // initialize the summing variable
   for( ; ; ) { // iterate from bottom to top of column

@@ -1,8 +1,8 @@
-ARDUINO_DIR 	= /usr/share/arduino
+ARDUINO_DIR 	= /home/gose/arduino-1.5.8
 ARDMK_DIR	= ./arduino-mk
 AVR_TOOLS_DIR	= /usr
 
-BOARD_TAG	= uno
+BOARD_TAG	= yun
 ARDUINO_PORT	= /dev/ttyACM0
 ARDUINO_LIBS	= Wire Wire/utility Scheduler OptoIn PIDuinoTasks cADC thermocouple TempMonitor PWM16 PID
 USER_LIB_PATH	= ./libraries

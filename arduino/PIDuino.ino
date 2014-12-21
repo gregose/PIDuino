@@ -5,7 +5,6 @@
 
 // lots of code from tc4-shield and aBourbon
 #include <Wire.h>
-
 // Third-party libraries
 #include <Scheduler.h>
 #include <PWM16.h>
@@ -28,7 +27,7 @@ OptoStatusUpdater opto_status_updater(50, &pid_updater);
 void setup()
 {
   Wire.begin();
-  Serial.begin(BAUD);
+  Serial1.begin(BAUD);
 
   // SSR, uses timer1 to schedule duty cycle
   ssr.Setup(SSR_FREQ);
