@@ -35,14 +35,14 @@ void OptoStatusUpdater::run(Scheduler* scheduler)
       pid->brewSetPoint();
 
     // Output status
-    Serial.print("S|");
-    Serial.print(opto_status->ch0);
-    Serial.print("|");
-    Serial.print(opto_status->ch1);
-    Serial.print("|");
-    Serial.print(opto_status->ch2);
-    Serial.print("|");
-    Serial.print(opto_status->ch3);
-    Serial.println();
+    Serial1.print("S|");
+    Serial1.print(opto_status->ch0);
+    Serial1.print("|");
+    Serial1.print(opto_status->ch1);
+    Serial1.print("|");
+    Serial1.print(opto_status->ch2);
+    Serial1.print("|");
+    Serial1.print(opto_status->ch3);
+    Serial1.println();
   }
 }

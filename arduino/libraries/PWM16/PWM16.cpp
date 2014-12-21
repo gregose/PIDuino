@@ -10,28 +10,28 @@
 //
 // Contributor:  Jim Gallt
 //
-// Redistribution and use in source and binary forms, with or without modification, are 
+// Redistribution and use in source and binary forms, with or without modification, are
 // permitted provided that the following conditions are met:
 //
-//   Redistributions of source code must retain the above copyright notice, this list of 
+//   Redistributions of source code must retain the above copyright notice, this list of
 //   conditions and the following disclaimer.
 //
-//   Redistributions in binary form must reproduce the above copyright notice, this list 
-//   of conditions and the following disclaimer in the documentation and/or other materials 
+//   Redistributions in binary form must reproduce the above copyright notice, this list
+//   of conditions and the following disclaimer in the documentation and/or other materials
 //   provided with the distribution.
 //
-//   Neither the name of the MLG Properties, LLC nor the names of its contributors may be 
-//   used to endorse or promote products derived from this software without specific prior 
+//   Neither the name of the MLG Properties, LLC nor the names of its contributors may be
+//   used to endorse or promote products derived from this software without specific prior
 //   written permission.
 //
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS 
-// OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
-// MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL 
-// THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
-// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
-// HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
-// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
+// OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+// THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+// HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ------------------------------------------------------------------------------------------
 
@@ -54,7 +54,7 @@ void PWM16::Setup( unsigned int pwmF ) {
   _pwmF = pwmF;
   noInterrupts();
   // non inverting, fast PWM, TOP is in ICR1
-  TCCR1A = _BV(COM1A1) | _BV(COM1B1) | _BV(WGM11); 
+  TCCR1A = _BV(COM1A1) | _BV(COM1B1) | _BV(WGM11);
   // fast PWM, TOP in ICR1, prescale N = 1024
   TCCR1B = _BV(WGM13) | _BV(WGM12) | _BV(CS12) | _BV(CS10);
   ICR1 = _pwmF;
@@ -68,8 +68,8 @@ void PWM16::Reset() {
 
   // first, disable timer1
   noInterrupts();
-  TCCR1A = 0; 
-  TCCR1B = 0; 
+  TCCR1A = 0;
+  TCCR1B = 0;
   interrupts();
 
   // next, reset timer1 to default values
@@ -95,7 +95,7 @@ void PWM16::Out( unsigned int dutyA, unsigned int dutyB ){
   // trap logic errors safely
   if( dutyA > pwmDutyMax ) dutyA = pwmDutyError;
   if( dutyB > pwmDutyMax ) dutyB = pwmDutyError;
-  
+
   // special case: force no output for zero duty cycle
   // otherwise will get 1 clock cycle ON in most modes
   if( dutyA != 0 ) pinMode( pwmOutA, OUTPUT ); else pinMode( pwmOutA, INPUT );
@@ -120,13 +120,16 @@ unsigned int PWM16::GetTOP () {
 
 // ------------------------------------------- PWM_IO3 methods
 
+// Timer3 not on atmega32u4
+#if defined(__AVR_ATmega328P__)
+
 // setup timer parameters
 void PWM_IO3::Setup( uint8_t pwm_mode, uint8_t prescale ) {
   pinMode( IO3_PIN, OUTPUT );
   _pwm_mode = pwm_mode;
   _prescale = prescale;
   TCCR2A = _pwm_mode;
-  TCCR2B = _prescale;  
+  TCCR2B = _prescale;
 }
 
 // output
@@ -134,3 +137,4 @@ void PWM_IO3::Out( uint8_t duty ) {
   analogWrite( IO3_PIN, duty );
 }
 
+#endif

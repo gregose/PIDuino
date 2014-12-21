@@ -27,9 +27,13 @@
 
 unsigned long __ulCounter = 0;
 
-ISR(TIMER2_OVF_vect) {
-  RESET_TIMER2;
-  __ulCounter++;    
+// User timer4 for atmega32u4
+// http://harizanov.com/2013/04/crazy-high-frequency-pwm-with-atmega32u4/
+// http://docs.ros.org/hydro/api/segbot_firmware/html/NewPing_8cpp_source.html
+
+ISR(TIMER4_OVF_vect) {
+  TCNT4 = 0;
+  __ulCounter++;
 };
 
 Scheduler::Scheduler()
@@ -40,21 +44,18 @@ Scheduler::Scheduler()
 
 void Scheduler::setup()
 {
-  //Timer2 Settings: Timer Prescaler /64,
-  TCCR2A |= (1<<CS22);
-  TCCR2A &= ~((1<<CS21) | (1<<CS20));
+  // Disable timer4 int
+  TIMSK4 = 0;
+  // Clear
+  TCCR4A = TCCR4C = TCCR4D = TCCR4E = 0;
+  // Set Timer4 prescaler to 64 (4uS/count, 4uS-1020uS range).
+  TCCR4B = (1<<CS42) | (1<<CS41) | (1<<CS40) | (1<<PSR4);
+  TIFR4 = (1<<TOV4);
+  TCNT4 = 0;
 
-  // Use normal mode
-  TCCR2A &= ~((1<<WGM21) | (1<<WGM20));
+  OCR4C = 249;         // Every count is 4uS, so 1ms = 250 counts - 1.
+  TIMSK4 = (1<<TOIE4); // Enable Timer4 interrupt.
 
-  // Use internal clock - external clock not used in Arduino
-  ASSR |= (0<<AS2);
-
-  //Timer2 Overflow Interrupt Enable
-  TIMSK2 |= (1<<TOIE2) | (0<<OCIE2A);
-
-  // Reset timer
-  RESET_TIMER2;
   sei();
 }
 
@@ -63,14 +64,14 @@ void Scheduler::processMessages()
   // Check the schedule
   for( int i=0; i<SCHEDULE_MAX; i++)
   {
-    if(_taskSchedule[i].task && 
+    if(_taskSchedule[i].task &&
        _taskSchedule[i].milliseconds <= __ulCounter)
     {
       queue(_taskSchedule[i].task);
       _taskSchedule[i].task = 0;
     }
   }
-  
+
   // Clear the queue
   for( int i=0; i<QUEUE_MAX; i++)
   {
@@ -83,7 +84,7 @@ void Scheduler::processMessages()
 }
 
 void Scheduler::queue(ITask* task)
-{  
+{
   for( int i=0; i<QUEUE_MAX; i++)
   {
     if(!_taskQueue[i] )
@@ -118,142 +119,3 @@ void Scheduler::clearSchedule()
   for( int i=0; i<SCHEDULE_MAX; i++)
     _taskSchedule[i].task = 0;
 }
-
-//////////////////////////////////////////////////////////////
-// Task definition examples
-//////////////////////////////////////////////////////////////
-/*
-class Blinker : public ITask
-{
-  public:
-    void setup();
-    void run(Scheduler*);
-    Blinker(int, int);
-    
-  private:
-    int _pin;
-    int _period;
-    int _state;
-};
-
-Blinker::Blinker(int pin, int period)
-{
-  _pin = pin;
-  _state = 0;
-  _period = period;
-}
-
-void Blinker::setup()
-{
-  pinMode( _pin, OUTPUT);  
-}
-
-void Blinker::run(Scheduler* scheduler)
-{
-  scheduler->schedule(this, _period);
-  
-  _state = (_state>0)?0:1;  
-  digitalWrite(_pin, _state);
-}
-
-#include <Servo.h>
-class ServoTask : public ITask
-{
-  public:
-    void setup();
-    void run(Scheduler*);
-    ServoTask(int, int);
-    
-  private:
-    int _pin;
-    int _index;
-    int _period;
-    int _angle[2];
-    Servo servo;
-};
-
-ServoTask::ServoTask(int pin, int period)
-{
-  _pin = pin;
-  _index = 0;
-  _period = period;
-  _angle[0] = 45;
-  _angle[1] = 135;
-}
-
-void ServoTask::setup()
-{
-  servo.attach(_pin);
-}
-
-void ServoTask::run(Scheduler* scheduler)
-{
-  scheduler->schedule(this, _period);
-  
-  _index = (_index)?0:1;
-  servo.write(_angle[_index]);
-}
-
-class Clock : public ITask
-{
-  public:
-    void setup();
-    void run(Scheduler*);
-    Clock();
-    
-  private:
-    int _seconds;
-};
-
-Clock::Clock()
-{
-  _seconds = 0;
-}
-
-void Clock::setup()
-{
-  Serial.begin(115200);
-}
-
-void Clock::run(Scheduler* scheduler)
-{
-  scheduler->schedule(this, 1000);  
-  Serial.println(_seconds++);
-}
-
-//////////////////////////////////////////////////////////////
-// MAIN
-//////////////////////////////////////////////////////////////
-
-// Create a task scheduler singleton
-Scheduler __scheduler;
-
-// Create custom tasks
-Clock _clock;
-Blinker _blinker12(12, 1000);
-Blinker _blinker13(13, 50);
-ServoTask _servo10(10, 500);
-ServoTask _servo11(11, 3000);
-
-void setup()
-{ 
-  _clock.setup();
-  _servo10.setup();
-  _servo11.setup();
-  _blinker12.setup();  
-  _blinker13.setup();  
-    
-  __scheduler.setup();
-  __scheduler.queue(&_clock);
-  __scheduler.queue(&_blinker12);
-  __scheduler.queue(&_blinker13);
-  __scheduler.schedule(&_servo10, 1000);
-  __scheduler.schedule(&_servo11, 2000);
-}
-
-void loop()
-{
-  __scheduler.processMessages();
-}
-
-*/

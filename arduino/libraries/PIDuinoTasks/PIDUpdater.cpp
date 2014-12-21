@@ -19,7 +19,7 @@ PIDUpdater::PIDUpdater(int period_in, PWM16* ssr_in, TempUpdater* temp_in, PIDPo
   //Kp = 0.20 * Ku;
   //Ki = (2.0 * Kp) / Tu;
   //Kd = (Kp * Tu) / 3;
-  
+
   // Prevent integral windup from intial machine warmup
   // From http://playground.arduino.cc/Main/BarebonesPIDForEspresso#pid
   // http://en.wikipedia.org/wiki/Integral_windup
@@ -54,7 +54,7 @@ PIDUpdater::PIDUpdater(int period_in, PWM16* ssr_in, TempUpdater* temp_in, PIDPo
     Td = Pu/8 = 17.9
 
     http://newton.ex.ac.uk/teaching/CDHW/Feedback/Setup-PID.html
-      It should yield a system that is slightly underdamped; if a less "aggressive" response is 
+      It should yield a system that is slightly underdamped; if a less "aggressive" response is
       desired try reducing P to half the values listed.
   */
 }
@@ -90,7 +90,7 @@ void PIDUpdater::setup() {
 }
 
 void PIDUpdater::run(Scheduler* scheduler) {
-  
+
   float error;
   float derivative;
   float dt;
@@ -111,7 +111,7 @@ void PIDUpdater::run(Scheduler* scheduler) {
 
     error = setpoint - measured_value;
 
-    
+
     derivative = (error - previous_error) / dt;
 
     if(error > integral_cutoff_error) { // disable integration if large error
@@ -132,26 +132,26 @@ void PIDUpdater::run(Scheduler* scheduler) {
     if (output > 100) output = 100;
     if (output < 0) output = 0;
 
-    Serial.print("P|");
-    Serial.print(dt);
-    Serial.print("|");
-    Serial.print(setpoint);
-    Serial.print("|");
-    Serial.print(measured_value);
-    Serial.print("|");
-    Serial.print(output);
-    Serial.print("|");
-    Serial.print(error);
-    Serial.print("|");
-    Serial.print(integral);
-    Serial.print("|");
-    Serial.print(derivative);
-    Serial.print("|");
-    Serial.print(Kp);
-    Serial.print("|");
-    Serial.print(Ki);
-    Serial.print("|");
-    Serial.println(Kd);
+    Serial1.print("P|");
+    Serial1.print(dt);
+    Serial1.print("|");
+    Serial1.print(setpoint);
+    Serial1.print("|");
+    Serial1.print(measured_value);
+    Serial1.print("|");
+    Serial1.print(output);
+    Serial1.print("|");
+    Serial1.print(error);
+    Serial1.print("|");
+    Serial1.print(integral);
+    Serial1.print("|");
+    Serial1.print(derivative);
+    Serial1.print("|");
+    Serial1.print(Kp);
+    Serial1.print("|");
+    Serial1.print(Ki);
+    Serial1.print("|");
+    Serial1.println(Kd);
 
 
     ssr->Out(output, 0); // Set OT1 to output

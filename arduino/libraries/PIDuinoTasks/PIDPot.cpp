@@ -17,10 +17,10 @@ void PIDPot::setup()
 void PIDPot::run(Scheduler* scheduler)
 {
   scheduler->schedule(this, _period);
-  
+
   _val = map(analogRead(_pin), 0, 1023, 0, 100);
-  Serial.print("K|");
-  Serial.println(_val);
+  Serial1.print("K|");
+  Serial1.println(_val);
 }
 
 double PIDPot::val()

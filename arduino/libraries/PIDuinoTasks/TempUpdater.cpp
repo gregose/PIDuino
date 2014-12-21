@@ -47,13 +47,13 @@ void TempUpdater::run(Scheduler* scheduler) {
     case RUN_STATE_READ:
       TempStatus * temp_status = temp_monitor.status();
 
-      Serial.print("T|");
-      Serial.print(temp_status->ambient);
-      Serial.print("|");
-      Serial.print(temp_status->boiler);
-      Serial.print("|");
-      Serial.print(temp_status->brewgroup);
-      Serial.println();
+      Serial1.print("T|");
+      Serial1.print(temp_status->ambient);
+      Serial1.print("|");
+      Serial1.print(temp_status->boiler);
+      Serial1.print("|");
+      Serial1.print(temp_status->brewgroup);
+      Serial1.println();
 
       // For PID updates
       last_temp_status.ambient = temp_status->ambient;

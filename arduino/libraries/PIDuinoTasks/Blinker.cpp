@@ -11,13 +11,15 @@ Blinker::Blinker(int pin, int period)
 
 void Blinker::setup()
 {
-  pinMode( _pin, OUTPUT);  
+  pinMode( _pin, OUTPUT);
 }
 
 void Blinker::run(Scheduler* scheduler)
 {
   scheduler->schedule(this, _period);
-  
-  _state = (_state>0)?0:1;  
+
+  _state = (_state>0)?0:1;
   digitalWrite(_pin, _state);
+  Serial1.print("B|");
+  Serial1.println(_state==0?"0":"1");
 }
