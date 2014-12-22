@@ -10,7 +10,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/jacobsa/go-serial/serial"
-	"go/build"
 	"io"
 	"log"
 	"net/http"
@@ -299,11 +298,7 @@ func init() {
 func main() {
 	flag.Parse()
 
-	pkgInfo, err := build.Import("github.com/gregose/PIDuino-ui", "", 0)
-	if err != nil {
-		panic(err)
-	}
-	viewPath = filepath.Join(pkgInfo.Dir, "views", viewPath)
+	viewPath = filepath.Join(".", "views", viewPath)
 
 	go h.BroadcastLoop()
 	go serialLoop()
@@ -314,7 +309,7 @@ func main() {
 	http.Handle("/ws", websocket.Handler(wsServer))
 
 	portString := fmt.Sprintf(":%d", port)
-	err = http.ListenAndServe(portString, nil)
+	err := http.ListenAndServe(portString, nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
