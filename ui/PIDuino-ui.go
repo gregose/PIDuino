@@ -9,7 +9,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/jacobsa/go-serial/serial"
+	"github.com/gregose/go-serial/serial"
 	"io"
 	"log"
 	"net/http"
