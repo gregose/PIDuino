@@ -1,3 +1,4 @@
-./PIDuino-ui.go
+PIDuino-ui.go
 ui
 ui-mips
+ui-views*.go

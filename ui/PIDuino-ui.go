@@ -9,11 +9,11 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/elazarl/go-bindata-assetfs"
 	"github.com/gregose/go-serial/serial"
 	"io"
 	"log"
 	"net/http"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -230,20 +230,6 @@ func serialLoop() {
 	}
 }
 
-func IndexHandler(w http.ResponseWriter, req *http.Request) {
-	var filePath string
-
-	if req.URL.Path == "/" {
-		filePath = fmt.Sprintf("%s/index.html", viewPath)
-	} else {
-		filePath = fmt.Sprintf("%s/%s", viewPath, req.URL.Path)
-	}
-	if logging {
-		log.Println(filePath)
-	}
-	http.ServeFile(w, req, filePath)
-}
-
 func BufferHandler(w http.ResponseWriter, req *http.Request) {
 	bufferJSON, err := json.Marshal(messageBuffer)
 	if err != nil {
@@ -287,17 +273,14 @@ func init() {
 	flag.BoolVar(&devMode, "dev", false, "Dev mode")
 	flag.BoolVar(&devMode, "d", false, "Dev mode (shorthand).")
 
-	flag.StringVar(&viewPath, "view", "default", "View directory to serve.")
-	flag.StringVar(&viewPath, "v", "default", "View directory to serve (shorthand).")
-
 	flag.IntVar(&bufferSize, "num", 60*15, "Number of previous broadcasts to keep in memory.")
 	flag.IntVar(&bufferSize, "n", 60*15, "Number of previous broadcasts to keep in memory (shorthand).")
 
 	flag.UintVar(&baudRate, "baud", 57600, "Serial port baud rate.")
 	flag.UintVar(&baudRate, "b", 57600, "Serial port baud rate.")
 
-	flag.StringVar(&serialPort, "serial", "/dev/tty.usbmodem1411", "Serial port device.")
-	flag.StringVar(&serialPort, "s", "/dev/tty.usbmodem1411", "Serial port device.")
+	flag.StringVar(&serialPort, "serial", "/dev/ttyACM0", "Serial port device.")
+	flag.StringVar(&serialPort, "s", "/dev/ttyACM0", "Serial port device.")
 
 	messageBuffer = make([]string, 0)
 
@@ -309,8 +292,6 @@ func init() {
 func main() {
 	flag.Parse()
 
-	viewPath = filepath.Join(".", "views", viewPath)
-
 	go h.BroadcastLoop()
 
 	if devMode {
@@ -319,10 +300,12 @@ func main() {
 		go serialLoop()
 	}
 
-	http.HandleFunc("/", IndexHandler)
 	http.HandleFunc("/buffer.json", BufferHandler)
 	http.HandleFunc("/flush", FlushHandler)
 	http.Handle("/ws", websocket.Handler(wsServer))
+	http.Handle("/",
+		http.FileServer(
+			&assetfs.AssetFS{Asset: Asset, AssetDir: AssetDir, Prefix: "views"}))
 
 	portString := fmt.Sprintf(":%d", port)
 	err := http.ListenAndServe(portString, nil)
