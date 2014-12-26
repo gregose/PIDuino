@@ -179,12 +179,20 @@ func (s *Socket) ReceiveMessage() {
 	s.Ws.Close()
 }
 
+func devLoop() {
+	for {
+		str := "T|80.1|82.2|103.3"
+		h.Pipe <- str
+		time.Sleep(time.Duration(1) * time.Second)
+	}
+}
+
 func serialLoop() {
-	c := serial.OpenOptions {
-		PortName: serialPort,
-		BaudRate: baudRate,
-		DataBits: 8,
-		StopBits: 1,
+	c := serial.OpenOptions{
+		PortName:        serialPort,
+		BaudRate:        baudRate,
+		DataBits:        8,
+		StopBits:        1,
 		MinimumReadSize: 4,
 	}
 
@@ -257,13 +265,13 @@ func wsServer(ws *websocket.Conn) {
 }
 
 var (
-	h                    Hub
-	viewPath             string
-	port, bufferSize     int
-	passThrough, logging bool
-	messageBuffer        []string
-	serialPort           string
-	baudRate             uint
+	h                             Hub
+	viewPath                      string
+	port, bufferSize              int
+	passThrough, logging, devMode bool
+	messageBuffer                 []string
+	serialPort                    string
+	baudRate                      uint
 )
 
 func init() {
@@ -275,6 +283,9 @@ func init() {
 
 	flag.BoolVar(&logging, "log", false, "Log HTTP requests to STDOUT")
 	flag.BoolVar(&logging, "l", false, "Log HTTP requests t STDOUT (shorthand).")
+
+	flag.BoolVar(&devMode, "dev", false, "Dev mode")
+	flag.BoolVar(&devMode, "d", false, "Dev mode (shorthand).")
 
 	flag.StringVar(&viewPath, "view", "default", "View directory to serve.")
 	flag.StringVar(&viewPath, "v", "default", "View directory to serve (shorthand).")
@@ -301,7 +312,12 @@ func main() {
 	viewPath = filepath.Join(".", "views", viewPath)
 
 	go h.BroadcastLoop()
-	go serialLoop()
+
+	if devMode {
+		go devLoop()
+	} else {
+		go serialLoop()
+	}
 
 	http.HandleFunc("/", IndexHandler)
 	http.HandleFunc("/buffer.json", BufferHandler)
