@@ -7,18 +7,16 @@ function updateTimer() {
 }
 
 function startTimer() {
-	start = new Date().getTime();
+  start = new Date().getTime();
 
   if (timer > 0) {
     return;
   }
 
-  updateTimer();	
+  updateTimer();
 }
 
 function stopTimer() {
   clearTimeout(timer);
   timer = 0;
 }
-
-//startTimer();

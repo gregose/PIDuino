@@ -2,13 +2,13 @@ $(function() {
   // Init switch display
   $('#temp-mode').text('Idle');
   $('#temp-status').text('');
-  $('#brew_detail').hide();
+  $('#brew_detail').show();
 
   // Init temp graph
   var now = Math.floor((new Date).getTime()/1000);
   var data = [
-    { label: 'Boiler', values: [ {time: now, y: 0} ] },
-    { label: 'Grouphead', values: [ {time: now, y: 0} ] }
+    { label: 'Boiler', values: [ { time: now, y: 0 } ] },
+    { label: 'Grouphead', values: [ { time: now, y: 0 } ] }
   ];
 
   var tempGraph = $('#temp-graph').epoch({
@@ -16,11 +16,12 @@ $(function() {
     data: data,
     ticks: { time: 30, right: 10, left: 10 },
     axes: ['left', 'right', 'bottom'],
-    windowSize: 180
+    windowSize: 180,
+    margins: { top: 10, right: 30, bottom: 30, left: 30 }
   });
 
   // Handle incoming messages
-  var websocket = new WebSocket("ws://"+document.location.host+"/ws");
+  var websocket = new WebSocket("ws://"+document.location.host+"/events");
   websocket.onmessage = function(msg){
     var data = JSON.parse(msg.data);
     var timestamp = Math.floor(data.Timestamp / 1000);

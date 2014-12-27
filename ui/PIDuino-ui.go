@@ -244,7 +244,7 @@ func FlushHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(w, "Flushed")
 }
 
-func wsServer(ws *websocket.Conn) {
+func eventServer(ws *websocket.Conn) {
 	s := &Socket{ws}
 	h.Connections[s] = true
 	s.ReceiveMessage()
@@ -302,7 +302,7 @@ func main() {
 
 	http.HandleFunc("/buffer.json", BufferHandler)
 	http.HandleFunc("/flush", FlushHandler)
-	http.Handle("/ws", websocket.Handler(wsServer))
+	http.Handle("/events", websocket.Handler(eventServer))
 	http.Handle("/",
 		http.FileServer(
 			&assetfs.AssetFS{Asset: Asset, AssetDir: AssetDir, Prefix: "views"}))

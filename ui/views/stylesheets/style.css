@@ -3,22 +3,43 @@ body {
   font-family: 'Roboto', sans-serif;
   font-weight: 300;
   font-size: 20px;
-  background-color: black;
-  color: #fefefe;
-}
-
-a {
-  color: #00B7FF;
+  background-color: #212121;
+  color: #E0F2F1;
 }
 
 #temp-graph {
   height: 300px;
 }
 
+#temp-graph .tick text {
+  font-weight: 700;
+  fill: #E0F2F1;
+}
+
+#temp-graph .line {
+  stroke-width: 4px;
+}
+
+#temp-graph .boiler .line {
+  stroke: #FFAB91;
+}
+
+#temp-graph .grouphead .line {
+  stroke: #B39DDB;
+}
+
 .label {
-  margin-bottom: 0px;
+  color: #B2DFDB;
+  margin-bottom: -20px;
   font-size: 24px;
-  color: #99cc00;
+}
+
+.boiler {
+  color: #FFCCBC;
+}
+
+.grouphead {
+  color: #D1C4E9;
 }
 
 .temp, .time {
@@ -29,6 +50,7 @@ a {
 }
 
 #brew_detail {
+  color: #B2DFDB;
   text-align: left;
   margin-top: -30px;
 }
@@ -37,39 +59,11 @@ a {
   text-align: left;
   font-weight: 700;
   font-size: 180px;
-  margin-top: -10px;
-}
-
-span.reset {
-  float: right;
-  font-size: 18px;
-  color: #00B7FF;
+  margin-top: -50px;
 }
 
 span.flare {
   position: relative;
   font-size: 32px;
   display: none;
-}
-
-.status {
-}
-
-ul.status {
-  list-style: none;
-  margin-left: 0px;
-  padding-left: 0px;
-  font: 26px "RobotoBold";
-}
-
-li.status {
-  margin-left: 0px;
-}
-
-ul.status > li.on {
-  color: #000;
-}
-
-ul.status > li.off {
-  color: #ccc;
 }
