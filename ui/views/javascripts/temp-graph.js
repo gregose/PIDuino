@@ -9,12 +9,13 @@ $(function() {
   $.getJSON("/buffer.json", function(buffer) {
 
     // Init graph w/ temp history buffer
+    var secondsPerTick = Math.floor(buffer.MaxLogSize / 6);
     var tempGraph = $("#temp-graph").epoch({
       type: "time.line",
       data: buffer.Data,
-      ticks: { time: 30, right: 10, left: 10 },
+      ticks: { time: secondsPerTick, right: 10, left: 10 },
       axes: ["left", "right", "bottom"],
-      windowSize: 180,
+      windowSize: buffer.MaxLogSize,
       historySize: buffer.MaxLogSize,
       margins: { top: 0, right: 35, bottom: 30, left: 35 }
     });

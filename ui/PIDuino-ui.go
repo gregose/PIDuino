@@ -296,14 +296,14 @@ var (
 )
 
 func init() {
-	flag.IntVar(&port, "port", 9193, "Webserver port.")
-	flag.IntVar(&port, "p", 9193, "Webserver port (shorthand).")
+	flag.IntVar(&port, "port", 8080, "Webserver port.")
+	flag.IntVar(&port, "p", 8080, "Webserver port (shorthand).")
 
 	flag.BoolVar(&passThrough, "through", false, "Pass serial input to STDOUT.")
 	flag.BoolVar(&passThrough, "t", false, "Pass serial input to STDOUT (shorthand).")
 
 	flag.BoolVar(&logging, "log", false, "Log HTTP requests to STDOUT")
-	flag.BoolVar(&logging, "l", false, "Log HTTP requests t STDOUT (shorthand).")
+	flag.BoolVar(&logging, "l", false, "Log HTTP requests to STDOUT (shorthand).")
 
 	flag.BoolVar(&devMode, "dev", false, "Dev mode")
 	flag.BoolVar(&devMode, "d", false, "Dev mode (shorthand).")
@@ -317,10 +317,6 @@ func init() {
 	flag.StringVar(&serialPort, "serial", "/dev/ttyACM0", "Serial port device.")
 	flag.StringVar(&serialPort, "s", "/dev/ttyACM0", "Serial port device.")
 
-	tempLog = temperatureLog{LogSize: 0, MaxLogSize: maxLogSize, Data: make([]temperatureLogEntry, 2)}
-	tempLog.Data[0] = temperatureLogEntry{Label: "Boiler", Values: make([]temperatureLogValue, 0)}
-	tempLog.Data[1] = temperatureLogEntry{Label: "Grouphead", Values: make([]temperatureLogValue, 0)}
-
 	// Dev starting values
 	lastDevGrouphead = 100.0
 	lastDevBoiler = 180.0
@@ -332,6 +328,10 @@ func init() {
 
 func main() {
 	flag.Parse()
+
+	tempLog = temperatureLog{LogSize: 0, MaxLogSize: maxLogSize, Data: make([]temperatureLogEntry, 2)}
+	tempLog.Data[0] = temperatureLogEntry{Label: "Boiler", Values: make([]temperatureLogValue, 0)}
+	tempLog.Data[1] = temperatureLogEntry{Label: "Grouphead", Values: make([]temperatureLogValue, 0)}
 
 	go h.broadcastLoop()
 
