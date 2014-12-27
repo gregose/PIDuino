@@ -24,9 +24,9 @@ $(function() {
   var websocket = new WebSocket("ws://"+document.location.host+"/events");
   websocket.onmessage = function(msg){
     var data = JSON.parse(msg.data);
-    var timestamp = Math.floor(data.Timestamp / 1000);
+    var timestamp = Math.floor(data.Header.Timestamp / 1000);
     console.log(data);
-    switch(data.Type) {
+    switch(data.Header.Type) {
     case "Temp":
       $('#brew').text(data.GroupHead);
       $('#boiler').text(data.Boiler);

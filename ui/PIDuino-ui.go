@@ -19,12 +19,12 @@ import (
 	"time"
 )
 
-type Hub struct {
-	Connections map[*Socket]bool
+type hub struct {
+	Connections map[*socket]bool
 	Pipe        chan string
 }
 
-func ParseMessage(inStr string) ([]byte, error) {
+func parseMessage(inStr string) ([]byte, error) {
 	parts := strings.Split(strings.TrimSpace(inStr), "|")
 	t := time.Now()
 	ts := t.UnixNano() / 1e6
@@ -33,9 +33,9 @@ func ParseMessage(inStr string) ([]byte, error) {
 		if len(parts) != 4 {
 			break
 		}
-		temp := new(TemperatureMessage)
-		temp.MessageHeader.Type = "Temp"
-		temp.MessageHeader.Timestamp = ts
+		temp := new(temperatureMessage)
+		temp.Header.Type = "Temp"
+		temp.Header.Timestamp = ts
 		temp.Ambient, _ = strconv.ParseFloat(parts[1], 64)
 		temp.Boiler, _ = strconv.ParseFloat(parts[2], 64)
 		temp.GroupHead, _ = strconv.ParseFloat(parts[3], 64)
@@ -44,18 +44,18 @@ func ParseMessage(inStr string) ([]byte, error) {
 		if len(parts) != 2 {
 			break
 		}
-		knob := new(KnobMessage)
-		knob.MessageHeader.Type = "Knob"
-		knob.MessageHeader.Timestamp = ts
+		knob := new(knobMessage)
+		knob.Header.Type = "Knob"
+		knob.Header.Timestamp = ts
 		knob.Value, _ = strconv.ParseFloat(parts[1], 64)
 		return json.Marshal(knob)
 	case "S":
 		if len(parts) != 5 {
 			break
 		}
-		switchState := new(SwitchStateMessage)
-		switchState.MessageHeader.Type = "SwitchState"
-		switchState.MessageHeader.Timestamp = ts
+		switchState := new(switchStateMessage)
+		switchState.Header.Type = "SwitchState"
+		switchState.Header.Timestamp = ts
 		switchState.Power = (parts[1] == "1")
 		switchState.Brew = (parts[2] == "1")
 		switchState.HotWater = (parts[3] == "1")
@@ -65,9 +65,9 @@ func ParseMessage(inStr string) ([]byte, error) {
 		if len(parts) != 11 {
 			break
 		}
-		pid := new(PIDMessage)
-		pid.MessageHeader.Type = "PID"
-		pid.MessageHeader.Timestamp = ts
+		pid := new(pidMessage)
+		pid.Header.Type = "PID"
+		pid.Header.Timestamp = ts
 		pid.dT, _ = strconv.ParseFloat(parts[1], 64)
 		pid.SetPoint, _ = strconv.ParseFloat(parts[2], 64)
 		pid.Input, _ = strconv.ParseFloat(parts[3], 64)
@@ -83,38 +83,38 @@ func ParseMessage(inStr string) ([]byte, error) {
 	return nil, errors.New("message type not found")
 }
 
-type Message struct {
+type message struct {
 	Timestamp int64
 	Message   string
 }
 
-type MessageHeader struct {
+type messageHeader struct {
 	Timestamp int64
 	Type      string
 }
 
-type TemperatureMessage struct {
-	MessageHeader
+type temperatureMessage struct {
+	Header    messageHeader
 	Ambient   float64
 	Boiler    float64
 	GroupHead float64
 }
 
-type KnobMessage struct {
-	MessageHeader
-	Value float64
+type knobMessage struct {
+	Header messageHeader
+	Value  float64
 }
 
-type SwitchStateMessage struct {
-	MessageHeader
+type switchStateMessage struct {
+	Header   messageHeader
 	Power    bool
 	Brew     bool
 	HotWater bool
 	Steam    bool
 }
 
-type PIDMessage struct {
-	MessageHeader
+type pidMessage struct {
+	Header     messageHeader
 	dT         float64
 	SetPoint   float64
 	Input      float64
@@ -127,16 +127,11 @@ type PIDMessage struct {
 	kD         float64
 }
 
-type Broadcast struct {
-	Timestamp int64
-	Messages  []*Message
-}
-
-func (h *Hub) BroadcastLoop() {
+func (h *hub) broadcastLoop() {
 	for {
 		str := <-h.Pipe
 
-		broadcastJSON, err := ParseMessage(str)
+		broadcastJSON, err := parseMessage(str)
 
 		if err != nil {
 			log.Println("Buffer JSON Error: ", err)
@@ -145,7 +140,7 @@ func (h *Hub) BroadcastLoop() {
 
 		log.Println(string(broadcastJSON))
 
-		for s, _ := range h.Connections {
+		for s := range h.Connections {
 			err := websocket.Message.Send(s.Ws, string(broadcastJSON))
 			if err != nil {
 				if err.Error() != ("use of closed network connection") {
@@ -163,11 +158,11 @@ func (h *Hub) BroadcastLoop() {
 	}
 }
 
-type Socket struct {
+type socket struct {
 	Ws *websocket.Conn
 }
 
-func (s *Socket) ReceiveMessage() {
+func (s *socket) receiveMessage() {
 
 	for {
 		var x []byte
@@ -230,7 +225,7 @@ func serialLoop() {
 	}
 }
 
-func BufferHandler(w http.ResponseWriter, req *http.Request) {
+func bufferHandler(w http.ResponseWriter, req *http.Request) {
 	bufferJSON, err := json.Marshal(messageBuffer)
 	if err != nil {
 		log.Println("Buffer JSON error:", err)
@@ -239,19 +234,19 @@ func BufferHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(w, string(bufferJSON))
 }
 
-func FlushHandler(w http.ResponseWriter, req *http.Request) {
+func flushHandler(w http.ResponseWriter, req *http.Request) {
 	messageBuffer = messageBuffer[:0]
 	fmt.Fprintf(w, "Flushed")
 }
 
 func eventServer(ws *websocket.Conn) {
-	s := &Socket{ws}
+	s := &socket{ws}
 	h.Connections[s] = true
-	s.ReceiveMessage()
+	s.receiveMessage()
 }
 
 var (
-	h                             Hub
+	h                             hub
 	viewPath                      string
 	port, bufferSize              int
 	passThrough, logging, devMode bool
@@ -285,14 +280,14 @@ func init() {
 	messageBuffer = make([]string, 0)
 
 	// Set up hub
-	h.Connections = make(map[*Socket]bool)
+	h.Connections = make(map[*socket]bool)
 	h.Pipe = make(chan string, 1)
 }
 
 func main() {
 	flag.Parse()
 
-	go h.BroadcastLoop()
+	go h.broadcastLoop()
 
 	if devMode {
 		go devLoop()
@@ -300,8 +295,8 @@ func main() {
 		go serialLoop()
 	}
 
-	http.HandleFunc("/buffer.json", BufferHandler)
-	http.HandleFunc("/flush", FlushHandler)
+	http.HandleFunc("/buffer.json", bufferHandler)
+	http.HandleFunc("/flush", flushHandler)
 	http.Handle("/events", websocket.Handler(eventServer))
 	http.Handle("/",
 		http.FileServer(
