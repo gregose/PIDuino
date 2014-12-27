@@ -13,15 +13,75 @@ import (
 	"github.com/gregose/go-serial/serial"
 	"io"
 	"log"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
 )
 
+type socket struct {
+	Ws *websocket.Conn
+}
+
 type hub struct {
 	Connections map[*socket]bool
 	Pipe        chan string
+}
+
+type messageHeader struct {
+	Timestamp int64
+	Type      string
+}
+
+type temperatureMessage struct {
+	Header    messageHeader
+	Ambient   float64
+	Boiler    float64
+	Grouphead float64
+}
+
+type knobMessage struct {
+	Header messageHeader
+	Value  float64
+}
+
+type switchStateMessage struct {
+	Header   messageHeader
+	Power    bool
+	Brew     bool
+	HotWater bool
+	Steam    bool
+}
+
+type pidMessage struct {
+	Header     messageHeader
+	dT         float64
+	SetPoint   float64
+	Input      float64
+	Output     float64
+	Error      float64
+	Integral   float64
+	Derivative float64
+	kP         float64
+	kI         float64
+	kD         float64
+}
+
+type temperatureLogValue struct {
+	Time  int64   `json:"time"`
+	Value float64 `json:"y"`
+}
+
+type temperatureLogEntry struct {
+	Label  string                `json:"label"`
+	Values []temperatureLogValue `json:"values"`
+}
+
+type temperatureLog struct {
+	LogSize    int
+	MaxLogSize int
+	Data       []temperatureLogEntry
 }
 
 func parseMessage(inStr string) ([]byte, error) {
@@ -38,7 +98,23 @@ func parseMessage(inStr string) ([]byte, error) {
 		temp.Header.Timestamp = ts
 		temp.Ambient, _ = strconv.ParseFloat(parts[1], 64)
 		temp.Boiler, _ = strconv.ParseFloat(parts[2], 64)
-		temp.GroupHead, _ = strconv.ParseFloat(parts[3], 64)
+		temp.Grouphead, _ = strconv.ParseFloat(parts[3], 64)
+
+		// Boiler log buffer
+		if len(tempLog.Data[0].Values) >= maxLogSize {
+			tempLog.Data[0].Values = tempLog.Data[0].Values[1:]
+		}
+		boilerValue := temperatureLogValue{Time: ts / 1000, Value: temp.Boiler}
+		tempLog.Data[0].Values = append(tempLog.Data[0].Values, boilerValue)
+
+		// Grouphead log buffer
+		if len(tempLog.Data[1].Values) >= maxLogSize {
+			tempLog.Data[1].Values = tempLog.Data[1].Values[1:]
+		}
+		groupheadValue := temperatureLogValue{Time: ts / 1000, Value: temp.Grouphead}
+		tempLog.Data[1].Values = append(tempLog.Data[1].Values, groupheadValue)
+		tempLog.LogSize = len(tempLog.Data[0].Values)
+
 		return json.Marshal(temp)
 	case "K":
 		if len(parts) != 2 {
@@ -83,50 +159,6 @@ func parseMessage(inStr string) ([]byte, error) {
 	return nil, errors.New("message type not found")
 }
 
-type message struct {
-	Timestamp int64
-	Message   string
-}
-
-type messageHeader struct {
-	Timestamp int64
-	Type      string
-}
-
-type temperatureMessage struct {
-	Header    messageHeader
-	Ambient   float64
-	Boiler    float64
-	GroupHead float64
-}
-
-type knobMessage struct {
-	Header messageHeader
-	Value  float64
-}
-
-type switchStateMessage struct {
-	Header   messageHeader
-	Power    bool
-	Brew     bool
-	HotWater bool
-	Steam    bool
-}
-
-type pidMessage struct {
-	Header     messageHeader
-	dT         float64
-	SetPoint   float64
-	Input      float64
-	Output     float64
-	Error      float64
-	Integral   float64
-	Derivative float64
-	kP         float64
-	kI         float64
-	kD         float64
-}
-
 func (h *hub) broadcastLoop() {
 	for {
 		str := <-h.Pipe
@@ -150,20 +182,10 @@ func (h *hub) broadcastLoop() {
 				delete(h.Connections, s)
 			}
 		}
-
-		if len(messageBuffer) > bufferSize {
-			messageBuffer = messageBuffer[1:]
-		}
-		messageBuffer = append(messageBuffer, string(broadcastJSON))
 	}
 }
 
-type socket struct {
-	Ws *websocket.Conn
-}
-
 func (s *socket) receiveMessage() {
-
 	for {
 		var x []byte
 		err := websocket.Message.Receive(s.Ws, &x)
@@ -174,9 +196,22 @@ func (s *socket) receiveMessage() {
 	s.Ws.Close()
 }
 
+// Generate random temp values for dev mode
 func devLoop() {
 	for {
-		str := "T|80.1|82.2|103.3"
+		if rand.Intn(2) < 1 {
+			lastDevGrouphead += (float64(rand.Intn(200)) / 10.0)
+		} else {
+			lastDevGrouphead -= (float64(rand.Intn(200)) / 10.0)
+		}
+
+		if rand.Intn(2) < 1 {
+			lastDevBoiler += (float64(rand.Intn(200)) / 10.0)
+		} else {
+			lastDevBoiler -= (float64(rand.Intn(200)) / 10.0)
+		}
+
+		str := fmt.Sprintf("T|80.1|%f|%f", lastDevBoiler, lastDevGrouphead)
 		h.Pipe <- str
 		time.Sleep(time.Duration(1) * time.Second)
 	}
@@ -217,7 +252,7 @@ func serialLoop() {
 			}
 
 			if passThrough {
-				fmt.Print(str)
+				log.Print(str)
 			}
 
 			h.Pipe <- str
@@ -226,17 +261,20 @@ func serialLoop() {
 }
 
 func bufferHandler(w http.ResponseWriter, req *http.Request) {
-	bufferJSON, err := json.Marshal(messageBuffer)
+	bufferJSON, err := json.Marshal(tempLog)
 	if err != nil {
 		log.Println("Buffer JSON error:", err)
 		return
 	}
-	fmt.Fprintf(w, string(bufferJSON))
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(bufferJSON)
 }
 
 func flushHandler(w http.ResponseWriter, req *http.Request) {
-	messageBuffer = messageBuffer[:0]
-	fmt.Fprintf(w, "Flushed")
+	tempLog.Data[0].Values = tempLog.Data[0].Values[:0]
+	tempLog.Data[1].Values = tempLog.Data[1].Values[:0]
+	tempLog.LogSize = 0
+	w.Write([]byte("flushed"))
 }
 
 func eventServer(ws *websocket.Conn) {
@@ -248,16 +286,18 @@ func eventServer(ws *websocket.Conn) {
 var (
 	h                             hub
 	viewPath                      string
-	port, bufferSize              int
+	port, maxLogSize              int
 	passThrough, logging, devMode bool
-	messageBuffer                 []string
+	tempLog                       temperatureLog
 	serialPort                    string
 	baudRate                      uint
+	lastDevGrouphead              float64
+	lastDevBoiler                 float64
 )
 
 func init() {
-	flag.IntVar(&port, "port", 9193, "Port for the pipesock to sit on.")
-	flag.IntVar(&port, "p", 9193, "Port for the pipesock to sit on (shorthand).")
+	flag.IntVar(&port, "port", 9193, "Webserver port.")
+	flag.IntVar(&port, "p", 9193, "Webserver port (shorthand).")
 
 	flag.BoolVar(&passThrough, "through", false, "Pass serial input to STDOUT.")
 	flag.BoolVar(&passThrough, "t", false, "Pass serial input to STDOUT (shorthand).")
@@ -268,8 +308,8 @@ func init() {
 	flag.BoolVar(&devMode, "dev", false, "Dev mode")
 	flag.BoolVar(&devMode, "d", false, "Dev mode (shorthand).")
 
-	flag.IntVar(&bufferSize, "num", 60*15, "Number of previous broadcasts to keep in memory.")
-	flag.IntVar(&bufferSize, "n", 60*15, "Number of previous broadcasts to keep in memory (shorthand).")
+	flag.IntVar(&maxLogSize, "num", 180, "Number of previous temperatures to keep in memory.")
+	flag.IntVar(&maxLogSize, "n", 180, "Number of previous temperatures to keep in memory (shorthand).")
 
 	flag.UintVar(&baudRate, "baud", 57600, "Serial port baud rate.")
 	flag.UintVar(&baudRate, "b", 57600, "Serial port baud rate.")
@@ -277,7 +317,13 @@ func init() {
 	flag.StringVar(&serialPort, "serial", "/dev/ttyACM0", "Serial port device.")
 	flag.StringVar(&serialPort, "s", "/dev/ttyACM0", "Serial port device.")
 
-	messageBuffer = make([]string, 0)
+	tempLog = temperatureLog{LogSize: 0, MaxLogSize: maxLogSize, Data: make([]temperatureLogEntry, 2)}
+	tempLog.Data[0] = temperatureLogEntry{Label: "Boiler", Values: make([]temperatureLogValue, 0)}
+	tempLog.Data[1] = temperatureLogEntry{Label: "Grouphead", Values: make([]temperatureLogValue, 0)}
+
+	// Dev starting values
+	lastDevGrouphead = 100.0
+	lastDevBoiler = 180.0
 
 	// Set up hub
 	h.Connections = make(map[*socket]bool)

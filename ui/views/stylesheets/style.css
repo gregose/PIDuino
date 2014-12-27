@@ -5,10 +5,11 @@ body {
   font-size: 20px;
   background-color: #212121;
   color: #E0F2F1;
+
 }
 
 #temp-graph {
-  height: 300px;
+  height: 290px;
 }
 
 #temp-graph .tick text {
@@ -27,6 +28,12 @@ body {
 #temp-graph .grouphead .line {
   stroke: #B39DDB;
 }
+
+/*#main {
+  background: url(/images/coffee.svg);
+  background-repeat: none;
+  background-size: 110px 110px;
+}*/
 
 .label {
   color: #B2DFDB;
