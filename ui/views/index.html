@@ -14,8 +14,8 @@
 </head>
 
 <body>
-  <div id="main" class="container_12 epoch-theme-dark">
-    <div class="widget grid_9">
+  <div id="main" class="container_12 epoch-theme-dark push wrap">
+    <div class="widget grid_8">
       <div class="label boiler">
         Boiler // <span id="temp-mode">--</span> <span id="temp-status">--</span>
       </div>
@@ -44,16 +44,45 @@
       <p class="time">0.0<span class="flare">S</span></p>
     </div>
 
+    <div class="widget grid_1 menu-grid">
+      <a href="#menu" class="menu-link">&#9776;</a>
+    </div>
+
     <div class="clear"></div>
 
     <div id="temp-graph" class="epoch grid_12"></div>
 
     <div class="clear"></div>
   </div>
+
+  <nav id="menu" class="panel" role="navigation">
+    <div class="header">
+      PIDuino v1.1
+    </div>
+    <div class="subheader">
+      Settings
+    </div>
+    <form>
+      <div>
+        <label for="brew-setpoint">Brew setpoint</label>
+        <input id="brew-setpoint" name="brew-setpoint" value="212">
+      </div>
+      <div>
+        <label for="steam-setpoint">Steam setpoint</label>
+        <input id="steam-setpoint" name="steam-setpoint" value="250">
+      </div>
+      <div>
+        <label for="boxcar-token">Boxcar token</label>
+        <input id="boxcar-token" name="boxcar-token" value="999aaaa">
+      </div>
+    </form>
+  </nav>
+
   <script src="/javascripts/jquery-1.11.2.min.js" type="text/javascript"></script>
   <script src="/javascripts/timer.js" type="text/javascript"></script>
   <script src="/javascripts/d3.min.js" type="text/javascript"></script>
   <script src="/javascripts/epoch.min.js" type="text/javascript"></script>
   <script src="/javascripts/temp-graph.js" type="text/javascript"></script>
+  <script src="/javascripts/jquery.big-slide.js" type="text/javascript"></script>
 </body>
 </html>

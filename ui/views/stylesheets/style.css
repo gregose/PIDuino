@@ -69,6 +69,56 @@ body {
   margin-top: -50px;
 }
 
+.menu-grid {
+  text-align: right;
+}
+
+.menu-open {
+  color: red;
+}
+
+a.menu-link:link, a.menu-link:active, a.menu-link:visited  {
+  color: #E0F2F1;
+  text-decoration: none;
+}
+
+.panel {
+  position: fixed;
+  right: -800px; /*left or right and the width of your navigation panel*/
+  width: 800px; /*should match the above value*/
+  height: 100%;
+}
+
+.wrap {
+  position: relative;
+}
+
+#menu .header {
+  font-weight: 700;
+  font-size: 60px;
+  margin-bottom: 20px;
+}
+
+#menu .subheader {
+  font-weight: 400;
+  font-size: 24px;
+  color: #B2DFDB;
+  margin-bottom: 5px;
+}
+
+#menu label {
+  font-weight: 300;
+  display: inline-block;
+  width: 140px;
+  text-align: right;
+  padding-right: 15px;
+}
+
+#menu input {
+  width: 200px;
+}
+
+
 span.flare {
   position: relative;
   font-size: 32px;

@@ -1,5 +1,17 @@
 $(function() {
   var debugMode = window.location.hash == "#debug";
+  // side menu
+  var menu = $(".menu-link").bigSlide({
+    menuWidth: "800px",
+    side: "right",
+  });
+
+  $(".push").on("click", function(e){
+    if(e.target.className != "menu-link" && menu._state === "open") {
+      menu.close();
+    }
+  });
+
   // Init switch display
   $("#temp-mode").text("Idle");
   $("#temp-status").text("");

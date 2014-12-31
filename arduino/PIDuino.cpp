@@ -27,6 +27,9 @@ OptoStatusUpdater opto_status_updater(50, &pid_updater);
 void setup()
 {
   Wire.begin();
+
+  delayForYunBoot();
+
   Serial1.begin(BAUD);
 
   // SSR, uses timer1 to schedule duty cycle
@@ -51,4 +54,21 @@ void setup()
 void loop()
 {
   scheduler.processMessages();
+}
+
+void delayForYunBoot()
+{
+  // Delay until u-boot initiated
+  delay(2500);
+
+  Serial1.begin(115200); // Set the baud for u-boot.
+
+  // wait for u-boot to finish startup.
+  // consume all bytes until we are done.
+  do {
+    while (Serial1.available() > 0) {
+      Serial1.read();
+    }
+    delay(1000);
+  } while (Serial1.available() > 0);
 }
