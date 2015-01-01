@@ -18,7 +18,7 @@ PWM16 ssr;
 
 Scheduler scheduler;
 
-Blinker blink_13(13, 5000);
+Blinker blink_13(13, 1000);
 TempUpdater temp_updater(1000);
 PIDPot pid_pot(3, 1000);
 PIDUpdater pid_updater(2000, &ssr, &temp_updater, &pid_pot);
@@ -59,7 +59,7 @@ void loop()
 void delayForYunBoot()
 {
   // Delay until u-boot initiated
-  delay(2500);
+  delay(5000);
 
   Serial1.begin(115200); // Set the baud for u-boot.
 

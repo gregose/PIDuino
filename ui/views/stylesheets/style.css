@@ -80,6 +80,7 @@ body {
 a.menu-link:link, a.menu-link:active, a.menu-link:visited  {
   color: #E0F2F1;
   text-decoration: none;
+  font-size: 30px;
 }
 
 .panel {
@@ -109,18 +110,28 @@ a.menu-link:link, a.menu-link:active, a.menu-link:visited  {
 #menu label {
   font-weight: 300;
   display: inline-block;
-  width: 140px;
+  width: 200px;
   text-align: right;
   padding-right: 15px;
 }
 
 #menu input {
   width: 200px;
+  outline: 0;
 }
 
 
 span.flare {
   position: relative;
-  font-size: 32px;
-  display: none;
+  font-size: 16px;
+  top: -9px;
+  left: -2px;
+  opacity: 0.5;
+}
+
+label > span.flare {
+  position: relative;
+  font-size: 16px;
+  top: -3px;
+  opacity: 0.5;
 }

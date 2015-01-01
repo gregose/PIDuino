@@ -314,8 +314,8 @@ func init() {
 	flag.UintVar(&baudRate, "baud", 57600, "Serial port baud rate.")
 	flag.UintVar(&baudRate, "b", 57600, "Serial port baud rate.")
 
-	flag.StringVar(&serialPort, "serial", "/dev/ttyACM0", "Serial port device.")
-	flag.StringVar(&serialPort, "s", "/dev/ttyACM0", "Serial port device.")
+	flag.StringVar(&serialPort, "serial", "/dev/ttyATH0", "Serial port device.")
+	flag.StringVar(&serialPort, "s", "/dev/ttyATH0", "Serial port device.")
 
 	// Dev starting values
 	lastDevGrouphead = 100.0

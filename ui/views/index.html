@@ -17,10 +17,10 @@
   <div id="main" class="container_12 epoch-theme-dark push wrap">
     <div class="widget grid_8">
       <div class="label boiler">
-        Boiler // <span id="temp-mode">--</span> <span id="temp-status">--</span>
+        Boiler <span class="flare">&deg;F</span> // <span id="temp-mode">--</span> <span id="temp-status">--</span>
       </div>
 
-      <p id="boiler" class="temp">0<span class="flare">&deg;F</span></p>
+      <p id="boiler" class="temp">0</p>
 
       <p id="brew_detail">Setpoint @
         <span id="temp-setpoint">--</span>
@@ -32,16 +32,16 @@
 
     <div class="widget grid_3">
       <div class="label grouphead">
-        Grouphead
+        Grouphead <span class="flare">&deg;F</span>
       </div>
 
-      <p id="brew" class="temp">0.0<span class="flare">&deg;F</span></p>
+      <p id="brew" class="temp">0.0</p>
 
       <div class="label">
-        Shot Time
+        Shot Time <span class="flare">sec</span>
       </div>
 
-      <p class="time">0.0<span class="flare">S</span></p>
+      <p class="time">0.0</p>
     </div>
 
     <div class="widget grid_1 menu-grid">
@@ -64,15 +64,15 @@
     </div>
     <form>
       <div>
-        <label for="brew-setpoint">Brew setpoint</label>
+        <label for="brew-setpoint">Brew setpoint <span class="flare">&deg;F</span></label>
         <input id="brew-setpoint" name="brew-setpoint" value="212">
       </div>
       <div>
-        <label for="steam-setpoint">Steam setpoint</label>
+        <label for="steam-setpoint">Steam setpoint <span class="flare">&deg;F</span></label>
         <input id="steam-setpoint" name="steam-setpoint" value="250">
       </div>
       <div>
-        <label for="boxcar-token">Boxcar token</label>
+        <label for="boxcar-token">Boxcar user token</label>
         <input id="boxcar-token" name="boxcar-token" value="999aaaa">
       </div>
     </form>

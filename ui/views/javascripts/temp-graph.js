@@ -42,8 +42,8 @@ $(function() {
       }
       switch(data.Header.Type) {
       case "Temp":
-        $("#brew").text(data.Grouphead);
-        $("#boiler").text(data.Boiler);
+        $("#brew").text(data.Grouphead.toFixed(1));
+        $("#boiler").text(data.Boiler.toFixed(1));
         tempGraph.push([
           { time: timestamp, y: data.Boiler },
           { time: timestamp, y: data.Grouphead }
