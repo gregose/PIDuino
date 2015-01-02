@@ -57,12 +57,12 @@
 
   <nav id="menu" class="panel" role="navigation">
     <div class="header">
-      PIDuino v1.1
-    </div>
-    <div class="subheader">
-      Settings
+      PIDuino Settings
     </div>
     <form>
+      <div class="subheader">
+        PID
+      </div>
       <div>
         <label for="brew-setpoint">Brew setpoint <span class="flare">&deg;F</span></label>
         <input id="brew-setpoint" name="brew-setpoint" value="212">
@@ -70,6 +70,24 @@
       <div>
         <label for="steam-setpoint">Steam setpoint <span class="flare">&deg;F</span></label>
         <input id="steam-setpoint" name="steam-setpoint" value="250">
+      </div>
+      <div class="subheader">
+        Thermocouple calibration
+      </div>
+      <div>
+        <label for="steam-setpoint">ADC gain </label>
+        <input id="steam-setpoint" name="steam-setpoint" value="250">
+      </div>
+      <div>
+        <label for="brew-setpoint">ADC offset <span class="flare">uV</span></label>
+        <input id="brew-setpoint" name="brew-setpoint" value="212">
+      </div>
+      <div>
+        <label for="steam-setpoint">Ambient offset <span class="flare">&deg;C</span></label>
+        <input id="steam-setpoint" name="steam-setpoint" value="250">
+      </div>
+      <div class="subheader">
+        Notifications
       </div>
       <div>
         <label for="boxcar-token">Boxcar user token</label>

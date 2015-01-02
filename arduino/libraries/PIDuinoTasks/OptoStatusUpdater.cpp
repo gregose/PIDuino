@@ -8,15 +8,15 @@ OptoStatusUpdater::OptoStatusUpdater(int period_in, PIDUpdater* pid_in = NULL)
 }
 
 void OptoStatusUpdater::setup(){
-  opto_in.Setup();
+  opto_in.setup();
 }
 
 void OptoStatusUpdater::run(Scheduler* scheduler)
 {
   scheduler->schedule(this, period);
 
-  if(opto_in.Update() == true) {
-    OptoStatus * opto_status = opto_in.Status();
+  if(opto_in.update() == true) {
+    OptoStatus * opto_status = opto_in.status();
 
     // Set appropiate SSR state
     if(opto_status->ch0) {

@@ -23,12 +23,12 @@ struct OptoStatus
 class OptoIn {
   public:
     OptoIn();
-    void Setup();
-    boolean Update();
-    OptoStatus* Status();
+    void setup();
+    boolean update();
+    OptoStatus* status();
   private:
     OptoStatus _status;
-    OptoStatus _previous_status;  
+    OptoStatus _previous_status;
 };
 
 #endif

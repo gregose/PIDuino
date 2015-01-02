@@ -1,19 +1,26 @@
 #include "TempMonitor.h"
 
 // Todo implement settings here
-TempMonitor::TempMonitor() {
+TempMonitor::TempMonitor(Settings* settings_in) {
   adc = cADC( A_ADC ); // MCP3424
   amb = ambSensor( A_AMB ); // MCP9800
 
+  settings = settings_in;
   temp_samples = (TempSamples){0,0,0,0};
   temp_status = (TempStatus){0,0,0};
-  tc = TC_TYPE(); 
+  tc = TC_TYPE();
 }
 
 void TempMonitor::setup() {
   amb.init(AMB_FILTER);
-  adc.setCal( CAL_GAIN, UV_OFFSET );
-  amb.setOffset( AMB_OFFSET );
+
+  if(settings->available()) {
+    adc.setCal( settings->data()->cal_gain, settings->data()->cal_offset );
+    amb.setOffset( settings->data()->T_offset );
+  } else {
+    adc.setCal( CAL_GAIN, UV_OFFSET );
+    amb.setOffset( AMB_OFFSET );
+  }
   convert_time = max(adc.getConvTime(), amb.getConvTime());
 }
 
@@ -49,14 +56,14 @@ void TempMonitor::sample(int channel) {
   // Convert with ambient temp and to F
 
 #ifdef TEMP_UNIT_F
-  temp = tc.Temp_F( 0.001 * v, amb.getAmbF() ); 
+  temp = tc.Temp_F( 0.001 * v, amb.getAmbF() );
 #else
   temp = tc.Temp_C( 0.001 * v, amb.getAmbC() );
 #endif
 
   //Serial.println(C_TO_F(tempC));
   //v = round( C_TO_F( tempC ) / D_MULT ); // store results as integers
-  
+
   // Increase sample count
   temp_samples.samples++;
 
@@ -67,7 +74,7 @@ void TempMonitor::sample(int channel) {
 #endif
 
   switch (channel) {
-    case BOILER: 
+    case BOILER:
       temp_samples.boiler += temp;
       break;
     case BREWGROUP:
@@ -87,7 +94,7 @@ TempStatus* TempMonitor::status() {
   temp_status = (TempStatus){
     (temp_samples.ambient) / (temp_samples.samples),
     (temp_samples.boiler) / (temp_samples.samples / 2),
-    (temp_samples.brewgroup) / (temp_samples.samples / 2) 
+    (temp_samples.brewgroup) / (temp_samples.samples / 2)
   };
 
   resetSamples();

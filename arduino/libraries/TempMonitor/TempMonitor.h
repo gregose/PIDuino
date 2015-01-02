@@ -9,22 +9,23 @@
 
 #include <cADC.h>
 #include <thermocouple.h>
+#include <Settings.h>
 
 // ambient sensor should be stable, so quick variations are probably noise -- filter heavily
 #define AMB_FILTER 70 // 70% filtering on ambient sensor readings
 
 // default values for systems without calibration values stored in EEPROM
-#define CAL_GAIN 1.0 // you may substitute a known gain adjustment from calibration
-#define UV_OFFSET 38 // you may subsitute a known value for uV offset in ADC
-#define AMB_OFFSET -1.8 // you may substitute a known value for amb temp offset (Celsius)
+#define CAL_GAIN 1.0041999816 // you may substitute a known gain adjustment from calibration
+#define UV_OFFSET 0 // you may subsitute a known value for uV offset in ADC
+#define AMB_OFFSET -0.80 // you may substitute a known value for amb temp offset (Celsius)
 
 #define TC_TYPE typeT
 #define D_MULT 0.001 // multiplier to convert temperatures from int to float
 
 #define BOILER 0
-#define BREWGROUP 1 
+#define BREWGROUP 1
 
-#define TEMP_UNIT_F 
+#define TEMP_UNIT_F
 //#define TEMP_UNIT_C
 
 struct TempSamples
@@ -44,7 +45,7 @@ struct TempStatus
 
 class TempMonitor {
   public:
-    TempMonitor();
+    TempMonitor(Settings*);
     void setup();
 
     uint32_t convert(int channel);
@@ -58,6 +59,7 @@ class TempMonitor {
     ambSensor amb;
     TempStatus temp_status;
     TempSamples temp_samples;
+    Settings* settings;
     TC_TYPE tc;
     uint32_t convert_time;
 };

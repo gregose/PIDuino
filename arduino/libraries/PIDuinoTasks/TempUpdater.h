@@ -16,15 +16,15 @@ class TempUpdater : public ITask
   public:
     void setup();
     void run(Scheduler*);
-    TempUpdater(int);
+    TempUpdater(int, Settings*);
     TempStatus* lastTemp();
-    
+
   private:
     void next();
     int idle_time;
     int run_state;
-    TempMonitor temp_monitor;
-    TempStatus last_temp_status;
+    TempMonitor* temp_monitor;
+    TempStatus* last_temp_status;
 };
 
 #endif

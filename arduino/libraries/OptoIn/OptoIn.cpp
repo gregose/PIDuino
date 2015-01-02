@@ -5,23 +5,23 @@ OptoIn::OptoIn() {
   _status = (OptoStatus){false, false, false, false};
 }
 
-void OptoIn::Setup() {
+void OptoIn::setup() {
   pinMode(OPTOIN_CH0_PIN, INPUT);
   pinMode(OPTOIN_CH1_PIN, INPUT);
   pinMode(OPTOIN_CH2_PIN, INPUT);
   pinMode(OPTOIN_CH3_PIN, INPUT);
 }
 
-OptoStatus* OptoIn::Status() {
+OptoStatus* OptoIn::status() {
   return &_status;
 }
 
-boolean OptoIn::Update() {
+boolean OptoIn::update() {
   _previous_status.ch0 = _status.ch0;
   _previous_status.ch1 = _status.ch1;
   _previous_status.ch2 = _status.ch2;
   _previous_status.ch3 = _status.ch3;
-  
+
   _status.ch0 = digitalRead(OPTOIN_CH0_PIN) == 0;
   _status.ch1 = digitalRead(OPTOIN_CH1_PIN) == 0;
   _status.ch2 = digitalRead(OPTOIN_CH2_PIN) == 0;
@@ -30,5 +30,5 @@ boolean OptoIn::Update() {
   return _previous_status.ch0 != _status.ch0
          || _previous_status.ch1 != _status.ch1
          || _previous_status.ch2 != _status.ch2
-         || _previous_status.ch3 != _status.ch3; 
+         || _previous_status.ch3 != _status.ch3;
 }

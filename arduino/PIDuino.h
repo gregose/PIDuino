@@ -1,4 +1,4 @@
-#define BAUD 57600
+#define BAUD 115200
 
 #define SSR_FREQ pwmN1Hz
 

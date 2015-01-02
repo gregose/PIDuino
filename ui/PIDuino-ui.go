@@ -296,8 +296,8 @@ var (
 )
 
 func init() {
-	flag.IntVar(&port, "port", 8080, "Webserver port.")
-	flag.IntVar(&port, "p", 8080, "Webserver port (shorthand).")
+	flag.IntVar(&port, "port", 80, "Webserver port.")
+	flag.IntVar(&port, "p", 80, "Webserver port (shorthand).")
 
 	flag.BoolVar(&passThrough, "through", false, "Pass serial input to STDOUT.")
 	flag.BoolVar(&passThrough, "t", false, "Pass serial input to STDOUT (shorthand).")
@@ -311,8 +311,8 @@ func init() {
 	flag.IntVar(&maxLogSize, "num", 180, "Number of previous temperatures to keep in memory.")
 	flag.IntVar(&maxLogSize, "n", 180, "Number of previous temperatures to keep in memory (shorthand).")
 
-	flag.UintVar(&baudRate, "baud", 57600, "Serial port baud rate.")
-	flag.UintVar(&baudRate, "b", 57600, "Serial port baud rate.")
+	flag.UintVar(&baudRate, "baud", 115200, "Serial port baud rate.")
+	flag.UintVar(&baudRate, "b", 115200, "Serial port baud rate.")
 
 	flag.StringVar(&serialPort, "serial", "/dev/ttyATH0", "Serial port device.")
 	flag.StringVar(&serialPort, "s", "/dev/ttyATH0", "Serial port device.")
