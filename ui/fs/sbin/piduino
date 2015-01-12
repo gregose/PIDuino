@@ -1,0 +1,7 @@
+#!/bin/ash
+
+ROOT=/mnt/sda1
+ARGS=
+
+echo "START $(date)" >> $ROOT/piduino.log
+exec $ROOT/ui-mips $ARGS >> $ROOT/piduino.log 2>&1
