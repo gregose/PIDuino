@@ -9,34 +9,34 @@
 //
 // Contributor:  Jim Gallt
 //
-// Redistribution and use in source and binary forms, with or without modification, are 
+// Redistribution and use in source and binary forms, with or without modification, are
 // permitted provided that the following conditions are met:
 //
-//   Redistributions of source code must retain the above copyright notice, this list of 
+//   Redistributions of source code must retain the above copyright notice, this list of
 //   conditions and the following disclaimer.
 //
-//   Redistributions in binary form must reproduce the above copyright notice, this list 
-//   of conditions and the following disclaimer in the documentation and/or other materials 
+//   Redistributions in binary form must reproduce the above copyright notice, this list
+//   of conditions and the following disclaimer in the documentation and/or other materials
 //   provided with the distribution.
 //
-//   Neither the name of the MLG Properties, LLC nor the names of its contributors may be 
-//   used to endorse or promote products derived from this software without specific prior 
+//   Neither the name of the MLG Properties, LLC nor the names of its contributors may be
+//   used to endorse or promote products derived from this software without specific prior
 //   written permission.
 //
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS 
-// OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
-// MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL 
-// THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
-// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
-// HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
-// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
+// OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+// THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+// HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ------------------------------------------------------------------------------------------
 
-// Acknowledgement is given to Bill Welch for his development of the prototype hardware and software 
+// Acknowledgement is given to Bill Welch for his development of the prototype hardware and software
 // upon which much of this library is based.
- 
+
 // Revision history:
 //  Original version date: 9-June-2011
 //  20110609  Revisions to cADC for greater control over mode selection
@@ -68,7 +68,8 @@ protected:
 };
 
 // -------------- ADC configuration
-#define ADC_RDY 7  // ready bit
+#define ADC_RDY 7  // ready bit 0 output register updated with the latest conversion result
+                   //           1 output register has not been updated
 #define ADC_C1  6  // channel selection bit 1
 #define ADC_C0  5  // channel selection bit 0
 #define ADC_CMB 4  // conversion mode bit (1 = continuous 0 = one shot)
@@ -79,6 +80,7 @@ protected:
 
 #define ADC_GAIN_MASK ( _BV(ADC_G1) | _BV(ADC_G0) )
 #define ADC_RES_MASK  ( _BV(ADC_SR1) | _BV(ADC_SR0) )
+#define ADC_READY_MASK ( _BV(ADC_RDY) )
 
 // some 3424 config register values
 #define ADC_BITS_18 ( _BV(ADC_SR1) | _BV(ADC_SR0) )
