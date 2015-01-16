@@ -21,7 +21,7 @@ Settings settings;
 Blinker blink_13(13, 1000);
 TempUpdater temp_updater(1000, &settings);
 PIDPot pid_pot(3, 1000);
-PIDUpdater pid_updater(2000, &ssr, &temp_updater, &pid_pot);
+PIDUpdater pid_updater(2000, &ssr, &temp_updater, &pid_pot, &settings);
 OptoStatusUpdater opto_status_updater(50, &pid_updater);
 
 void setup()
@@ -35,6 +35,17 @@ void setup()
   // Output settings from eeprom
   settings.update();
   settings.log();
+
+  /* Update settings w/ new amb offset - */
+  //settings.data()->T_offset = -2.1;
+  settings.data()->brew_setpoint = 203.0;
+  settings.data()->steam_setpoint = 240.0;
+
+  settings.save();
+
+  settings.update();
+  settings.log();
+  /**/
 
   // SSR, uses timer1 to schedule duty cycle
   ssr.Setup(SSR_FREQ);
@@ -62,16 +73,22 @@ void loop()
 
 void delayForYunBoot()
 {
+  int c = -1;
+
   // Delay until u-boot initiated
-  delay(5000);
+  delay(10000);
 
   Serial1.begin(115200); // Set the baud for u-boot.
+  Serial.begin(115200); // output over CDC
 
   // wait for u-boot to finish startup.
   // consume all bytes until we are done.
   do {
     while (Serial1.available() > 0) {
-      Serial1.read();
+      c = Serial1.read();
+      if (c != -1) {
+        Serial.write(c);
+      }
     }
     delay(1000);
   } while (Serial1.available() > 0);

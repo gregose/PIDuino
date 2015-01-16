@@ -9,8 +9,8 @@
 // #define BREW_TEMP 195.00
 // #define STEAM_TEMP 290.00
 
-#define BREW_TEMP 209.00
-#define STEAM_TEMP 275.00
+#define BREW_SETPOINT 209.00
+#define STEAM_SETPOINT 275.00
 
 
 class PIDUpdater : public ITask
@@ -18,17 +18,18 @@ class PIDUpdater : public ITask
   public:
     void setup();
     void run(Scheduler*);
-    PIDUpdater(int, PWM16*, TempUpdater*, PIDPot*);
+    PIDUpdater(int, PWM16*, TempUpdater*, PIDPot*, Settings*);
     void enable();
     void disable(int);
     void brewSetPoint();
     void steamSetPoint();
-    
+
   private:
     int period;
     TempUpdater* temp;
     PWM16* ssr;
     PIDPot* pidpot;
+    Settings* settings;
 
     float setpoint;
     bool enabled;

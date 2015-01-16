@@ -27,6 +27,7 @@ public:
   Settings();
   boolean available();
   uint16_t update();
+  uint16_t save();
   void print();
   void log();
   SettingsBlock* data();

@@ -5,7 +5,11 @@ Settings::Settings() {
 }
 
 uint16_t Settings::update() {
-  eeprom.read( 0, (uint8_t*) &_data, sizeof( _data ) );
+  return eeprom.read( 0, (uint8_t*) &_data, sizeof( _data ) );
+}
+
+uint16_t Settings::save() {
+  return eeprom.write( 0, (uint8_t*) &_data, sizeof( _data ) );
 }
 
 SettingsBlock* Settings::data() {
@@ -26,6 +30,8 @@ void Settings::print() {
   Serial1.println(_data.cal_offset); // 0
   Serial1.println(_data.T_offset); // -0.80
   Serial1.println(_data.K_offset); // -0.80
+  Serial1.println(_data.brew_setpoint);
+  Serial1.println(_data.steam_setpoint);
   Serial1.println("---CONFIG---");
 }
 
@@ -43,5 +49,9 @@ void Settings::log() {
   Serial1.print(_data.T_offset); // -0.80
   Serial1.print("|");
   Serial1.print(_data.K_offset); // -0.80
+  Serial1.print("|");
+  Serial1.print(_data.brew_setpoint);
+  Serial1.print("|");
+  Serial1.print(_data.steam_setpoint);
   Serial1.println();
 }

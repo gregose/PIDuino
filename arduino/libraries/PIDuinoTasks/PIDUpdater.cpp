@@ -1,6 +1,7 @@
 #include "PIDUpdater.h"
 
-PIDUpdater::PIDUpdater(int period_in, PWM16* ssr_in, TempUpdater* temp_in, PIDPot* pidpot_in) {
+PIDUpdater::PIDUpdater(int period_in, PWM16* ssr_in, TempUpdater* temp_in,
+                        PIDPot* pidpot_in, Settings* settings_in) {
   float Ku = 6.0; // Ultimate gain
   float Tu = 173.0; // Period time in seconds
 
@@ -32,9 +33,9 @@ PIDUpdater::PIDUpdater(int period_in, PWM16* ssr_in, TempUpdater* temp_in, PIDPo
   ssr = ssr_in; // SSR, OT1 - boiler
   period = period_in; // Update period
   pidpot = pidpot_in; // Manual control if needed
+  settings = settings_in;
 
-  setpoint = BREW_TEMP;
-
+  brewSetPoint();
   disable(0);
                                         //k: P  I  D
   //pid = PID(&input, &output, &setpoint, 2, 5, 1, DIRECT);
@@ -79,11 +80,19 @@ void PIDUpdater::disable(int duty) {
 }
 
 void PIDUpdater::brewSetPoint() {
-  setpoint = BREW_TEMP;
+  if ( settings->available() ) {
+    setpoint = settings->data()->brew_setpoint;
+  } else {
+    setpoint = BREW_SETPOINT;
+  }
 }
 
 void PIDUpdater::steamSetPoint() {
-  setpoint = STEAM_TEMP;
+  if ( settings->available() ) {
+    setpoint = settings->data()->steam_setpoint;
+  } else {
+    setpoint = STEAM_SETPOINT;
+  }
 }
 
 void PIDUpdater::setup() {
