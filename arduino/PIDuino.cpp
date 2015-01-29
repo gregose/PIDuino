@@ -11,12 +11,14 @@
 #include <PIDuinoTasks.h>
 #include <TempMonitor.h>
 #include <Settings.h>
+#include <StatusLED.h>
 
 #include "PIDuino.h"
 
 PWM16 ssr;
 Scheduler scheduler;
 Settings settings;
+StatusLED status_led(STATUS_LED_R, STATUS_LED_G, STATUS_LED_B);
 
 Blinker blink_13(13, 1000);
 TempUpdater temp_updater(1000, &settings);
@@ -27,8 +29,11 @@ OptoStatusUpdater opto_status_updater(50, &pid_updater);
 void setup()
 {
   Wire.begin();
-
+  status_led.alpha(1);
+  status_led.yellow();
   delayForYunBoot();
+  status_led.on();
+  status_led.blue();
 
   Serial1.begin(BAUD);
 
@@ -38,13 +43,13 @@ void setup()
 
   /* Update settings w/ new amb offset - */
   //settings.data()->T_offset = -2.1;
-  settings.data()->brew_setpoint = 203.0;
-  settings.data()->steam_setpoint = 240.0;
+  //settings.data()->brew_setpoint = 203.0;
+  //settings.data()->steam_setpoint = 240.0;
+  //
+  //settings.save();
 
-  settings.save();
-
-  settings.update();
-  settings.log();
+  //settings.update();
+  //settings.log();
   /**/
 
   // SSR, uses timer1 to schedule duty cycle
@@ -77,6 +82,7 @@ void delayForYunBoot()
 
   // Delay until u-boot initiated
   delay(10000);
+  status_led.red();
 
   Serial1.begin(115200); // Set the baud for u-boot.
   Serial.begin(115200); // output over CDC
@@ -84,7 +90,9 @@ void delayForYunBoot()
   // wait for u-boot to finish startup.
   // consume all bytes until we are done.
   do {
+    status_led.off();
     while (Serial1.available() > 0) {
+      status_led.on();
       c = Serial1.read();
       if (c != -1) {
         Serial.write(c);
